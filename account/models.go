@@ -8,7 +8,6 @@ import (
 
 type User struct {
 	*gorm.Model
-	ID       uint   `gorm:"primary_key"`
 	Username string `gorm:"type:varchar(100);uniqueIndex"`
 	Password string `gorm:"type:varchar(100)"`
 	Email    string `gorm:"type:varchar(100);uniqueIndex"`
@@ -16,7 +15,6 @@ type User struct {
 
 type GeneralAccount struct {
 	*gorm.Model
-	ID     uint   `gorm:"primary_key"`
 	Code   string `gorm:"unique_index"`
 	User   User   `gorm:"foreignKey:UserId"`
 	UserId uint
@@ -24,7 +22,6 @@ type GeneralAccount struct {
 
 type DematAccount struct {
 	*gorm.Model
-	ID     uint   `gorm:"primary_key"`
 	Code   string `gorm:"uniqueIndex"`
 	User   User   `gorm:"foreignKey:UserId"`
 	UserId uint
@@ -33,7 +30,6 @@ type DematAccount struct {
 
 type BankAccount struct {
 	*gorm.Model
-	ID        uint   `gorm:"primary_key"`
 	AccountNo string `gorm:"uniqueIndex"`
 	User      User   `gorm:"foreignKey:UserId"`
 	UserId    uint

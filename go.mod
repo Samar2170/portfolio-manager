@@ -1,4 +1,4 @@
-module portfolio-manager
+module github.com/Samar2170/portfolio-manager
 
 go 1.19
 

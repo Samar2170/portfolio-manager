@@ -23,6 +23,7 @@ type Stock struct {
 	Symbol       string `gorm:"uniqueIndex"`
 	SecurityCode string `gorm:"unique"`
 	Exchange     string
+	Industry     string
 }
 
 type ListedNCD struct {
@@ -57,6 +58,7 @@ type MutualFund struct {
 	SchemeType     string
 	SchemeCategory string
 	SchemeNAVName  string `gorm:"unique"`
+	Category       string
 }
 
 type UnlistedNCD struct {

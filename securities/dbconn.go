@@ -10,7 +10,8 @@ import (
 var db *gorm.DB
 
 func connect() {
-	db, err := gorm.Open(postgres.Open(DBURI), &gorm.Config{})
+	var err error
+	db, err = gorm.Open(postgres.Open(DBURI), &gorm.Config{})
 	handleError(err)
 	db.AutoMigrate(&Stock{})
 	db.AutoMigrate(&ListedNCD{})
