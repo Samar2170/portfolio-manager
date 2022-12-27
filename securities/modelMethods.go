@@ -15,7 +15,18 @@ func GetAllStocks() ([]Stock, error) {
 }
 
 func (mf MutualFund) create() error {
-	fmt.Println(mf)
 	err := db.Create(&mf).Error
 	return err
+}
+
+func GetAllMutualFunds() ([]MutualFund, error) {
+	var mfs []MutualFund
+	err := db.Find(&mfs).Error
+	return mfs, err
+}
+
+func GetStockBySymbol(symbol string) (Stock, error) {
+	var stock Stock
+	err := db.First("symbol = ?", symbol).Error
+	return stock, err
 }

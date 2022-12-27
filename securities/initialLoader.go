@@ -2,6 +2,7 @@ package securities
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -68,7 +69,9 @@ func LoadMutualFunds() error {
 		mf := MutualFund{AMC: activeRow[0], SchemeName: activeRow[2], SchemeNAVName: activeRow[5], Category: activeRow[4]}
 		err := mf.create()
 		if err != nil {
-			// if err.Error()
+			if strings.Contains(err.Error(), "duplicate key value") {
+				continue
+			}
 			return err
 		}
 	}

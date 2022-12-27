@@ -1,12 +1,10 @@
 package main
 
-import (
-	"log"
-
-	"github.com/Samar2170/portfolio-manager/securities"
-)
-
 func main() {
+
+}
+
+func loadScripts() {
 	// err := securities.LoadNiftyStocks()
 	// if err != nil {
 	// 	log.Println(err)
@@ -18,8 +16,9 @@ func main() {
 	// for _, stock := range stocks {
 	// 	fmt.Println(stock.ID)
 	// }
-	err := securities.LoadMutualFunds()
-	if err != nil {
-		log.Println(err)
-	}
+	// err := securities.LoadMutualFunds()
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+
 }
