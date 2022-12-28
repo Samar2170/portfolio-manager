@@ -1,7 +1,9 @@
 package main
 
-func main() {
+import "github.com/Samar2170/portfolio-manager/api"
 
+func main() {
+	api.StartApiServer()
 }
 
 func loadScripts() {

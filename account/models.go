@@ -2,10 +2,7 @@ package account
 
 import (
 	"errors"
-	"strings"
-	"time"
 
-	"github.com/Samar2170/portfolio-manager/securities"
 	"gorm.io/gorm"
 )
 
@@ -39,48 +36,6 @@ type BankAccount struct {
 	Bank      string
 }
 
-type StockTrade struct {
-	TradeDate    time.Time
-	Stock        securities.Stock
-	Quantity     uint
-	Price        float64
-	TradeType    string
-	DematAccount DematAccount
-}
-
-type StockHolding struct {
-	Stock        securities.Stock
-	Quantity     uint
-	Price        float64
-	DematAccount DematAccount
-}
-
-func NewStockTrade(symbol, tradeType, dematAccountCode string, quantity uint, price float64, tradeDate time.Time) (*StockTrade, error) {
-	tradeTypeCap := strings.ToUpper(tradeType)
-	if tradeTypeCap != "BUY" && tradeTypeCap != "SELL" {
-		return &StockTrade{}, errors.New("trade type should be buy or sell")
-	}
-	stock, err := securities.GetStockBySymbol(symbol)
-	if err != nil {
-		return &StockTrade{}, errors.New("unable to find stock please check the symbol provided")
-	}
-	da, err := GetDematAccountByCode(dematAccountCode)
-
-	if err != nil {
-		return &StockTrade{}, errors.New("demat Account Code is not valid.Please Check")
-	}
-
-	return &StockTrade{
-		Stock:        stock,
-		TradeDate:    tradeDate,
-		Quantity:     quantity,
-		Price:        price,
-		TradeType:    tradeTypeCap,
-		DematAccount: da,
-	}, nil
-
-}
-
 func (u *User) GetOrCreate() (User, error) {
 	var existingUser User
 	_ = db.Where("username = ?", u.Username).First(&existingUser).Error
@@ -93,13 +48,13 @@ func (u *User) GetOrCreate() (User, error) {
 
 func GetUserById(userId uint) (User, error) {
 	var user User
-	err := db.First("id = ?", userId).Error
+	err := db.Where("id = ?", userId).First(&user).Error
 	return user, err
 }
 
 func GetUserByUsername(username string) (User, error) {
 	var user User
-	err := db.First("username = ", username).Error
+	err := db.Where("username = ?", username).First(&user).Error
 	return user, err
 }
 
@@ -119,6 +74,6 @@ func (ba *BankAccount) GetOrCreate() (BankAccount, error) {
 
 func GetDematAccountByCode(code string) (DematAccount, error) {
 	var da DematAccount
-	err := db.First("code = ?", code).Error
+	err := db.Where("code = ?", code).First(&da).Error
 	return da, err
 }
