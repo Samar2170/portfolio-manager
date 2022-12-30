@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"net/http"
@@ -52,12 +52,17 @@ func signup(c echo.Context) error {
 		Password: password,
 		Email:    email,
 	}
-	_, err2 := user.GetOrCreate()
+	user, err2 := user.GetOrCreate()
 	if err2 != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": "User already exists",
 		})
 	}
+	createAccountStatusJob := CreateUserAccountStatusJob{UserId: user.ID}
+	createGeneralAccountJob := CreateGeneralAccountJob{UserId: user.ID}
+	JobQueue <- createAccountStatusJob
+	JobQueue <- createGeneralAccountJob
+
 	return c.JSON(http.StatusOK, user)
 }
 

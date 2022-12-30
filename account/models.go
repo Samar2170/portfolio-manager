@@ -13,6 +13,13 @@ type User struct {
 	Email    string `gorm:"type:varchar(100);uniqueIndex"`
 }
 
+type UserAccountStatus struct {
+	*gorm.Model
+	UserId           uint
+	User             User `gorm:"foreignKey:UserId"`
+	GaAccountCreated bool `gorm:"default:false"`
+}
+
 type GeneralAccount struct {
 	*gorm.Model
 	Code   string `gorm:"unique_index"`
@@ -76,4 +83,10 @@ func GetDematAccountByCode(code string) (DematAccount, error) {
 	var da DematAccount
 	err := db.Where("code = ?", code).First(&da).Error
 	return da, err
+}
+
+func (uas UserAccountStatus) GetOrCreate() UserAccountStatus {
+	var nuas UserAccountStatus
+	_ = db.FirstOrCreate(&nuas, uas)
+	return nuas
 }
