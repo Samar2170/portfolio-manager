@@ -16,6 +16,8 @@ func StartApiServer() {
 	e.POST("/register-account/bank", RegisterBankAccounts)
 	e.POST("/register-trade/stock", RegisterStockTrades)
 
+	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
+	e.GET("/securities/stocks/search", SearchStocks)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
