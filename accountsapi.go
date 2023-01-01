@@ -70,6 +70,11 @@ func RegisterDematAccounts(c echo.Context) error {
 	code := c.FormValue("code")
 	broker := c.FormValue("broker")
 
+	if code == "" || broker == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "Code and Broker must not be empty",
+		})
+	}
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -85,5 +90,30 @@ func RegisterDematAccounts(c echo.Context) error {
 	return c.JSON(
 		http.StatusAccepted, map[string]string{
 			"message": "Demat Account Created",
+		})
+}
+func RegisterBankAccounts(c echo.Context) error {
+	accountNo := c.FormValue("account_number")
+	bank := c.FormValue("bank")
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "User Id not found",
+		})
+	}
+	if accountNo == "" || bank == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "Code and Broker must not be empty",
+		})
+	}
+	ba := account.BankAccount{
+		AccountNo: accountNo,
+		Bank:      bank,
+		UserId:    user.Id,
+	}
+	ba.GetOrCreate()
+	return c.JSON(
+		http.StatusAccepted, map[string]string{
+			"message": "Bank Account Created",
 		})
 }

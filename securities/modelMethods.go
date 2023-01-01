@@ -27,6 +27,6 @@ func GetAllMutualFunds() ([]MutualFund, error) {
 
 func GetStockBySymbol(symbol string) (Stock, error) {
 	var stock Stock
-	err := db.First("symbol = ?", symbol).Error
+	err := db.First(&stock, "symbol = ?", symbol).Error
 	return stock, err
 }

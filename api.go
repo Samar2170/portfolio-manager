@@ -12,6 +12,10 @@ func StartApiServer() {
 	e.POST("/signup", signup)
 	e.POST("/login", login)
 
+	e.POST("/register-account/demat", RegisterDematAccounts)
+	e.POST("/register-account/bank", RegisterBankAccounts)
+	e.POST("/register-trade/stock", RegisterStockTrades)
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
