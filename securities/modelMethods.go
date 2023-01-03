@@ -46,3 +46,9 @@ func SearchMutualFunds(symbol string, pagination utils.Pagination) (*utils.Pagin
 	err := db.Scopes(utils.Paginate(mfs, &pagination, db)).Where("scheme_nav_name ILIKE ?", "%"+symbol+"%").Find(&mfs).Error
 	return &pagination, mfs, err
 }
+
+func GetMutualFundById(mfId uint) (MutualFund, error) {
+	var mf MutualFund
+	err := db.First(&mf, "id = ?", mfId).Error
+	return mf, err
+}

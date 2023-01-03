@@ -70,16 +70,16 @@ func GetUserByUsername(username string) (User, error) {
 	return user, err
 }
 
-func (ga *GeneralAccount) GetOrCreate() (GeneralAccount, error) {
+func (ga *GeneralAccount) Create() (GeneralAccount, error) {
 	err := db.Create(&ga).Error
 	return *ga, err
 }
 
-func (da *DematAccount) GetOrCreate() (DematAccount, error) {
+func (da *DematAccount) Create() (DematAccount, error) {
 	err := db.Create(&da).Error
 	return *da, err
 }
-func (ba *BankAccount) GetOrCreate() (BankAccount, error) {
+func (ba *BankAccount) Create() (BankAccount, error) {
 	err := db.Create(&ba).Error
 	return *ba, err
 }
@@ -94,4 +94,15 @@ func (uas UserAccountStatus) GetOrCreate() UserAccountStatus {
 	var nuas UserAccountStatus
 	_ = db.FirstOrCreate(&nuas, uas)
 	return nuas
+}
+
+func GetBankAccountByNumber(accNumber string) (BankAccount, error) {
+	var ba BankAccount
+	err := db.First(&ba, "account_no = ?", accNumber).Error
+	return ba, err
+}
+func GetBankAccountByUserNBank(userId uint, bankName string) (BankAccount, error) {
+	var ba BankAccount
+	err := db.Where("user_id = ? AND bank = ?", userId, bankName).Error
+	return ba, err
 }

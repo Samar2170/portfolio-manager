@@ -37,3 +37,6 @@ ____________________        ___________________
 * Messenging Service (Signup using a token, that is to be given by the api and registered by messaging on telegram chat.)
 
 
+
+##
+* DO less at the api level , more over controller. WIll help in reusing code in bulk upload.

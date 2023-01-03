@@ -86,7 +86,7 @@ func RegisterDematAccounts(c echo.Context) error {
 		Code:   code,
 		Broker: broker,
 	}
-	da.GetOrCreate()
+	da.Create()
 	return c.JSON(
 		http.StatusAccepted, map[string]string{
 			"message": "Demat Account Created",
@@ -103,7 +103,7 @@ func RegisterBankAccounts(c echo.Context) error {
 	}
 	if accountNo == "" || bank == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "Code and Broker must not be empty",
+			"message": "bank and account_number must not be empty",
 		})
 	}
 	ba := account.BankAccount{
@@ -111,7 +111,7 @@ func RegisterBankAccounts(c echo.Context) error {
 		Bank:      bank,
 		UserId:    user.Id,
 	}
-	ba.GetOrCreate()
+	ba.Create()
 	return c.JSON(
 		http.StatusAccepted, map[string]string{
 			"message": "Bank Account Created",

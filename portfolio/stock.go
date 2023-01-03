@@ -30,11 +30,9 @@ func NewStockTrade(symbol, tradeType, dematAccountCode string, quantity uint, pr
 		return &StockTrade{}, errors.New("unable to find stock please check the symbol provided")
 	}
 	da, err := account.GetDematAccountByCode(dematAccountCode)
-
 	if err != nil {
 		return &StockTrade{}, errors.New("demat Account Code is not valid.Please Check")
 	}
-
 	return &StockTrade{
 		Stock:        stock,
 		TradeDate:    tradeDate,
@@ -52,7 +50,7 @@ func GetStockHolding(stock securities.Stock, dematAccount account.DematAccount) 
 	return sth, err
 }
 
-func CheckHoldings(stock securities.Stock, dematAcc account.DematAccount) bool {
+func checkStockHoldings(stock securities.Stock, dematAcc account.DematAccount) bool {
 	var count int64
 
 	db.Model(&StockHolding{}).Where("stock_id = ? ", stock.ID).Where("demat_account_id = ?", dematAcc.ID).Count(&count)
@@ -60,7 +58,7 @@ func CheckHoldings(stock securities.Stock, dematAcc account.DematAccount) bool {
 }
 
 func RegisterTrade(nst StockTrade) error {
-	holdingExists := CheckHoldings(nst.Stock, nst.DematAccount)
+	holdingExists := checkStockHoldings(nst.Stock, nst.DematAccount)
 	if holdingExists {
 		sth, err := GetStockHolding(nst.Stock, nst.DematAccount)
 		if err != nil {

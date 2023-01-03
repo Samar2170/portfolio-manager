@@ -6,16 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type IPFreq string
-
-const (
-	Monthly     IPFreq = "M"
-	Anually     IPFreq = "A"
-	Maturity    IPFreq = "E"
-	SemiAnually IPFreq = "S"
-	Quarterly   IPFreq = "Q"
-)
-
 type Stock struct {
 	*gorm.Model
 	ID           uint   `gorm:"primaryKey"`
@@ -33,7 +23,7 @@ type ListedNCD struct {
 	Symbol        string `gorm:"uniqueIndex"`
 	SecurityCode  string `gorm:"unique"`
 	Exchange      string
-	IPFreq        IPFreq
+	IPFreq        string
 	IPRate        float64
 	IPDate        time.Time
 	MtDate        time.Time
@@ -65,7 +55,7 @@ type UnlistedNCD struct {
 	*gorm.Model
 	ID            uint `gorm:"primaryKey"`
 	Name          uint `gorm:"unique"`
-	IPFreq        IPFreq
+	IPFreq        string
 	IPDate        time.Time
 	MtDate        time.Time
 	IPRate        float64
@@ -79,8 +69,9 @@ type FixedDeposit struct {
 	BankName  string `gorm:"unique"`
 	Amount    float64
 	IPRate    float64
-	IPFreq    IPFreq
+	IPFreq    string
 	IPDate    time.Time
 	StartDate time.Time
 	MtDate    time.Time
+	MtAmount  float64
 }

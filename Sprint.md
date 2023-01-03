@@ -1,7 +1,9 @@
 ### Tasks
 * Register Crypto/ MF Trades
 * Bulk Upload
-* Add pagination
+* Add pagination - Done
+* Add getorCreate 
+* 
 
 
 #### API ENDPOINTS

@@ -15,6 +15,10 @@ func connect() {
 	handleError(err)
 	db.AutoMigrate(&StockTrade{})
 	db.AutoMigrate(&StockHolding{})
+	db.AutoMigrate(&MFTrade{})
+	db.AutoMigrate(&MFHolding{})
+
+	db.AutoMigrate(&FDHolding{})
 }
 
 func handleError(err error) {

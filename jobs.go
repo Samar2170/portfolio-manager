@@ -18,7 +18,7 @@ func (cgaj CreateGeneralAccountJob) Do() {
 		UserId: cgaj.UserId,
 	}
 	var err error
-	ga, err = ga.GetOrCreate()
+	ga, err = ga.Create()
 	if err != nil {
 		log.Println(err)
 	}
