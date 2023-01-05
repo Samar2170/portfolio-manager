@@ -24,7 +24,3 @@ func handleError(err error) {
 		log.Println(err)
 	}
 }
-
-func init() {
-	connect()
-}

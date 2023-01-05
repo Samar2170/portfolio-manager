@@ -2,6 +2,7 @@ package securities
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Samar2170/portfolio-manager/utils"
 )
@@ -51,4 +52,41 @@ func GetMutualFundById(mfId uint) (MutualFund, error) {
 	var mf MutualFund
 	err := db.First(&mf, "id = ?", mfId).Error
 	return mf, err
+}
+func GetFDByID(id uint) (FixedDeposit, error) {
+	var fd FixedDeposit
+	err := db.First(&fd, "id = ?", id).Error
+	return fd, err
+}
+
+func (fd FixedDeposit) CalculateNextIPDate() time.Time {
+	var nextIPDate time.Time
+	today := time.Now()
+	if today.Before(fd.IPDate) {
+		switch fd.IPFreq {
+		case "A":
+			nextIPDate = fd.IPDate.AddDate(1, 0, 0)
+		case "M":
+			nextIPDate = fd.IPDate.AddDate(0, 1, 0)
+		case "Q":
+			nextIPDate = fd.IPDate.AddDate(0, 3, 0)
+		case "MT":
+			nextIPDate = fd.MtDate
+		case "SA":
+			nextIPDate = fd.IPDate.AddDate(0, 6, 0)
+		}
+	}
+	return nextIPDate
+}
+
+func UpdateNextIPDatesFDs() error {
+	var fds []FixedDeposit
+	err := db.Where("next_ip_date < CURRENT_DATE").Find(&fds).Error
+	if err != nil {
+		return err
+	}
+	for i, fd := range fds {
+		fmt.Println(i, fd)
+	}
+	return nil
 }

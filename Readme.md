@@ -40,3 +40,13 @@ ____________________        ___________________
 
 ##
 * DO less at the api level , more over controller. WIll help in reusing code in bulk upload.
+
+
+### Functionality
+## FD 
+* Calculate next ip_date and update it. (Cronj, securities)
+* Notify When interest is due.  (Cronj, portfolio)
+* Mark Instruments as expired once Maturity date is up. (Cronj, portfolio)
+* Calculate Accrued Interest.   (Cronj, portfolio)
+
+

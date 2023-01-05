@@ -1,9 +1,15 @@
 ### Tasks
 * Register Crypto/ MF Trades
-* Bulk Upload
+* Bulk Upload 
 * Add pagination - Done
 * Add getorCreate 
+* Add Notification service
+* Add cron service - Done
+* Write FD functionality
+* Add viper for config - Done
+* Job Models
 * 
+
 
 
 #### API ENDPOINTS

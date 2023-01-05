@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	DtFormat = "2022-11-22"
+	DtFormat = "2006-01-02"
 )
 
 func RegisterStockTrades(c echo.Context) error {
@@ -109,7 +109,7 @@ func RegisterMFTrades(c echo.Context) error {
 		}
 	}
 
-	quantityFloat, err := strconv.ParseFloat(quantity, 10)
+	quantityFloat, err := strconv.ParseFloat(quantity, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": "quantity should be a number",
@@ -171,12 +171,24 @@ func RegisterFD(c echo.Context) error {
 			"message": "amount , ip_rate, ip_frequency, start_date, account_number cant be empty",
 		})
 	}
-	amountFloat, err := strconv.ParseFloat(amount, 10)
-	mtAmountFloat, err := strconv.ParseFloat(mtAmount, 10)
-	ipRateFloat, err := strconv.ParseFloat(ipRate, 100)
+	amountFloat, err := strconv.ParseFloat(amount, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "make sure amount is a number and ipRate is in 0.0x Format",
+			"message": "make sure amount is a number",
+		})
+	}
+
+	mtAmountFloat, err := strconv.ParseFloat(mtAmount, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "make sure Mtamount is a number",
+		})
+	}
+
+	ipRateFloat, err := strconv.ParseFloat(ipRate, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "make sure ipRate is in 0.0x Format",
 		})
 	}
 	fdh, err := portfolio.CreateFDHolding(bankName, amountFloat, mtAmountFloat, ipRateFloat, ipFreq, startDate, ipDate, mtDate, accNumber)
@@ -186,7 +198,7 @@ func RegisterFD(c echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusBadRequest, map[string]string{
-		"message": fmt.Sprintf("FD created successfully with ID ", fdh.ID),
+		"message": fmt.Sprintf("FD created successfully with ID %d", fdh.ID),
 	})
 
 }
