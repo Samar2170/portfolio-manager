@@ -74,6 +74,10 @@ func (fd FixedDeposit) CalculateNextIPDate() time.Time {
 			nextIPDate = fd.MtDate
 		case "SA":
 			nextIPDate = fd.IPDate.AddDate(0, 6, 0)
+		case "QAD":
+			nextIPDate = utils.GetNextQuarter(time.Now())
+		case "SAD":
+			nextIPDate = utils.GetNextHY(time.Now())
 		}
 	}
 	return nextIPDate
@@ -89,4 +93,7 @@ func UpdateNextIPDatesFDs() error {
 		fmt.Println(i, fd)
 	}
 	return nil
+}
+func (fd *FixedDeposit) Create() error {
+	return db.Create(&fd).Error
 }

@@ -10,6 +10,15 @@ import (
 	"github.com/Samar2170/portfolio-manager/securities"
 )
 
+type FDFile struct {
+	Id       uint
+	User     account.User `gorm:"foreignKey:UserId"`
+	UserId   uint
+	FileName string
+	FilePath string
+	Parsed   bool
+}
+
 type FDHolding struct {
 	ID             uint                    `gorm:"primaryKey"`
 	FixedDeposit   securities.FixedDeposit `gorm:"foreignKey:FixedDepositId"`
@@ -23,12 +32,22 @@ func (fdh *FDHolding) create() error {
 	return err
 }
 
+func (fdf FDFile) Create() error {
+	err := db.Create(&fdf).Error
+	return err
+}
+func getFDFileById(fileId uint) (FDFile, error) {
+	var fdf FDFile
+	err := db.First(&fdf, "id = ?", fileId).Error
+	return fdf, err
+}
+
 func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq string, startDate, ipDate, mtDate, accNumber string) (FDHolding, error) {
 	bankNameCap := strings.ToUpper(bankName)
 	if _, ok := BankNames[bankNameCap]; !ok {
 		return FDHolding{}, errors.New("unknown bank name")
 	}
-	if ipRate < 0.01 || ipRate > 0.99 {
+	if ipRate < 0 || ipRate > 0.99 {
 		return FDHolding{}, errors.New("ip rate not in valid range")
 	}
 	if _, ok := ValidIPFreqs[ipfreq]; !ok {
@@ -49,7 +68,7 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 		return FDHolding{}, errors.New("mtDate date not valid")
 	}
 	fd := securities.FixedDeposit{
-		BankName:  bankNameCap,
+		// BankName:  bankNameCap,
 		Amount:    amount,
 		IPRate:    ipRate,
 		IPFreq:    ipfreq,
@@ -58,13 +77,18 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 		MtDate:    MtDateParsed,
 		MtAmount:  mtAmount,
 	}
+	err = fd.Create()
+	if err != nil {
+		log.Println(err)
+		return FDHolding{}, err
+	}
 	ba, err := account.GetBankAccountByNumber(accNumber)
 	if err != nil {
 		return FDHolding{}, errors.New("bank account number not valid")
 	}
 	fdh := FDHolding{
-		FixedDeposit: fd,
-		BankAccount:  ba,
+		FixedDepositId: fd.ID,
+		BankAccount:    ba,
 	}
 	err = fdh.create()
 	if err != nil {
@@ -73,3 +97,8 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 	return fdh, nil
 
 }
+
+// func ParseFDFile(fileId uint) error {
+// 	fdFile, err := getFDFileById(fileId)
+// 	return nil
+// }

@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	// testNewService()
-	RunServicesConcurrently()
+	testNewService()
+	// RunServicesConcurrently()
 }
 
 func RunServicesConcurrently() {
@@ -25,16 +25,6 @@ func RunServicesConcurrently() {
 }
 
 func testNewService() {
-	// securities.UpdateNextIPDatesFDs()
-	// fd, _ := securities.GetFDByID(2)
-	// nipd := fd.CalculateNextIPDate()
-	// t1 := fd.IPDate.AddDate(0, 1, 0)
-	// fmt.Println(fd.IPDate, fd.IPFreq, t1)
-	// t1 := time.Now()
-	// fmt.Println(t1)
-	// tom := t1.AddDate(0, 0, 1)
-	// mon := t1.AddDate(0, 1, 0)
-	// fmt.Printf("tommorow is %s, month after %s", tom, mon)
 
 }
 

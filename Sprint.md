@@ -8,7 +8,7 @@
 * Write FD functionality
 * Add viper for config - Done
 * Job Models
-* 
+* Logging for cron, Workerpool.  
 
 
 
@@ -16,3 +16,7 @@
 * View/Search across Stocks,MFs, Cryptos
 * Register Trades for all
 * Bulk Upload for all
+
+
+#### Bulk Upload
+* For Stocks, MF, Listed NCDs, FDs

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/utils"
 )
@@ -11,7 +9,7 @@ type CreateGeneralAccountJob struct {
 	UserId uint
 }
 
-func (cgaj CreateGeneralAccountJob) Do() {
+func (cgaj CreateGeneralAccountJob) Do() error {
 	accCode := utils.CreateRandomString(GACodeLen)
 	ga := account.GeneralAccount{
 		Code:   accCode,
@@ -20,21 +18,22 @@ func (cgaj CreateGeneralAccountJob) Do() {
 	var err error
 	ga, err = ga.Create()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
-
+	return nil
 }
 
 type CreateUserAccountStatusJob struct {
 	UserId uint
 }
 
-func (cuas CreateUserAccountStatusJob) Do() {
+func (cuas CreateUserAccountStatusJob) Do() error {
 	uas := account.UserAccountStatus{
 		UserId:           cuas.UserId,
 		GaAccountCreated: false,
 	}
 	uas.GetOrCreate()
+	return nil
 }
 
 const GACodeLen = 8

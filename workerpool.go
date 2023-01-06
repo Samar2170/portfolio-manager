@@ -1,7 +1,7 @@
 package main
 
 type Job interface {
-	Do()
+	Do() error
 }
 
 type Worker struct {
@@ -31,6 +31,7 @@ func (w Worker) Start() {
 			// take the Job channel and put in in workerpool
 			select {
 			case job := <-w.JobChannel:
+
 				job.Do()
 			case <-w.quit:
 				return

@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	DtFormat = "2006-01-02"
+	DtFormat       = "2006-01-02"
+	FDTemplateFile = "Assets/templates/FDBUTemp.csv"
 )
 
 func RegisterStockTrades(c echo.Context) error {
@@ -201,4 +202,8 @@ func RegisterFD(c echo.Context) error {
 		"message": fmt.Sprintf("FD created successfully with ID %d", fdh.ID),
 	})
 
+}
+
+func DownloadFDBulkUploadFile(c echo.Context) error {
+	return c.File(FDTemplateFile)
 }

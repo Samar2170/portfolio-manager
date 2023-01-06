@@ -1,0 +1,4 @@
+account_number,amount,ip_frequency,ip_rate,start_date,maturity_date,maturity_amount
+"“”Remove rows 2 -4 “”""",,,,,,
+alphanumeric,number,,in range ( 7% -> 0.07 ),,,"Optional, Only if MT "
+,,"(A, M, MT, Q, SA, QAD, SAD)",,2022-12-31,,

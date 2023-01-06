@@ -65,8 +65,8 @@ type UnlistedNCD struct {
 
 type FixedDeposit struct {
 	*gorm.Model
-	ID         uint   `gorm:"primaryKey"`
-	BankName   string `gorm:"unique"`
+	ID uint `gorm:"primaryKey"`
+	// BankName   string
 	Amount     float64
 	IPRate     float64
 	IPFreq     string

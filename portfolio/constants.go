@@ -15,11 +15,6 @@ var DBURI string
 func loadConfigFile() {
 	viper.SetConfigFile(".env")
 	viper.ReadInConfig()
-	fmt.Println(viper.Get("DBPORT"))
-	fmt.Println(viper.Get("DBHOST"))
-	fmt.Println(viper.Get("DBUSER"))
-	fmt.Println(viper.Get("DBPASSWORD"))
-	fmt.Println(viper.Get("DBNAME"))
 
 	DBURI = fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable",
 		viper.Get("DBHOST"),
@@ -44,9 +39,11 @@ var BankNames = map[string]struct{}{
 }
 
 var ValidIPFreqs = map[string]struct{}{
-	"A":  {},
-	"M":  {},
-	"MT": {},
-	"Q":  {},
-	"SA": {},
+	"A":   {},
+	"M":   {},
+	"MT":  {},
+	"Q":   {},
+	"SA":  {},
+	"QAD": {}, // quarterly adjusting, Bank format.
+	"SAD": {}, // semi annual adjusting, Govt format.
 }
