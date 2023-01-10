@@ -5,10 +5,10 @@
 * Add getorCreate 
 * Add Notification service
 * Add cron service - Done
-* Write FD functionality
+* Write FD functionality 
 * Add viper for config - Done
-* Job Models
-* Logging for cron, Workerpool.  
+* Job Models - Done
+* Logging for cron, Workerpool.  Half Done
 
 
 

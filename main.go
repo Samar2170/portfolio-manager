@@ -1,11 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"sync"
+
+	"github.com/Samar2170/portfolio-manager/securities"
 )
 
 func main() {
-	RunServicesConcurrently()
+	// RunServicesConcurrently()
+	testNewService()
 }
 
 func RunServicesConcurrently() {
@@ -21,7 +25,12 @@ func RunServicesConcurrently() {
 }
 
 func testNewService() {
+	fd, _ := securities.GetFDByID(1091)
+	nipd := securities.CalculateNextIPDate(fd)
 
+	fmt.Println(fd)
+	fmt.Println(nipd)
+	// securities.UpdateNextIPDatesFDs()
 }
 
 // func loadScripts() {

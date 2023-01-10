@@ -59,26 +59,30 @@ func GetFDByID(id uint) (FixedDeposit, error) {
 	return fd, err
 }
 
-func (fd FixedDeposit) CalculateNextIPDate() time.Time {
+func CalculateNextIPDate(fd FixedDeposit) time.Time {
 	var nextIPDate time.Time
 	today := time.Now()
-	if today.Before(fd.IPDate) {
+	ipdate := fd.IPDate
+	currIpdate := time.Date(today.Year(), ipdate.Month(), ipdate.Day(), 0, 0, 0, 0, time.Local)
+	if currIpdate.Before(today) {
 		switch fd.IPFreq {
 		case "A":
-			nextIPDate = fd.IPDate.AddDate(1, 0, 0)
+			nextIPDate = currIpdate.AddDate(1, 0, 0)
 		case "M":
-			nextIPDate = fd.IPDate.AddDate(0, 1, 0)
+			nextIPDate = currIpdate.AddDate(0, 1, 0)
 		case "Q":
-			nextIPDate = fd.IPDate.AddDate(0, 3, 0)
+			nextIPDate = currIpdate.AddDate(0, 3, 0)
 		case "MT":
 			nextIPDate = fd.MtDate
 		case "SA":
-			nextIPDate = fd.IPDate.AddDate(0, 6, 0)
+			nextIPDate = currIpdate.AddDate(0, 6, 0)
 		case "QAD":
 			nextIPDate = utils.GetNextQuarter(time.Now())
 		case "SAD":
 			nextIPDate = utils.GetNextHY(time.Now())
 		}
+	} else {
+		nextIPDate = currIpdate
 	}
 	return nextIPDate
 }
@@ -90,11 +94,12 @@ func UpdateNextIPDatesFDs() error {
 		return err
 	}
 	for i, fd := range fds {
-		fmt.Println(i, fd)
+		nipd := CalculateNextIPDate(fd)
+		fmt.Println(i, fd, nipd)
 	}
 	return nil
 }
+
 func (fd *FixedDeposit) Create() error {
 	return db.Create(&fd).Error
 }
-
