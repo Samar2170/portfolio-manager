@@ -7,7 +7,7 @@ import (
 
 func Inspect(f interface{}) map[string]string {
 	m := make(map[string]string)
-	val := reflect.ValueOf(f).Elem()
+	val := reflect.ValueOf(f)
 
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)

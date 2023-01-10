@@ -1,24 +1,41 @@
 package main
 
 import (
+	"fmt"
+	"log"
+	"os"
 	"reflect"
+	"time"
 
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/utils"
 )
+
+var logger *log.Logger
+
+func startLogger() {
+	t := time.Now()
+	file, err := os.OpenFile(fmt.Sprintf("logs/Workerpool_logs_%d-%d-%d", t.Day(), int(t.Month()), t.Year()), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		panic(err)
+	}
+	logger = log.New(file, "[Workerpool]-", log.Ldate|log.Ltime|log.Lshortfile)
+	logger.Println("----------------Workerpool Logger Started---------------")
+}
 
 type Job interface {
 	Do() error
 }
 
 func NewJobRecord(j Job, success bool, errorString string) account.JobRecord {
+
 	refJob := reflect.TypeOf(j)
 	fields := reflect.VisibleFields(refJob)
 	fieldString := ""
 	for _, field := range fields {
 		fieldString += field.Name + ","
 	}
-	structMap := utils.Inspect(&j)
+	structMap := utils.Inspect(j)
 	args := ""
 	for _, v := range structMap {
 		args += v
@@ -64,9 +81,12 @@ func (w Worker) Start() {
 
 				err := job.Do()
 				if err != nil {
-					NewJobRecord(job, false, err.Error())
+
+					jr := NewJobRecord(job, false, err.Error())
+					logger.Printf("Executing Job Name %s with fields %s", jr.Name, jr.Fields)
 				} else {
-					NewJobRecord(job, true, "")
+					jr := NewJobRecord(job, true, "")
+					logger.Printf("Executing Job Name %s with fields %s", jr.Name, jr.Fields)
 				}
 
 			case <-w.quit:
@@ -84,6 +104,7 @@ func (w Worker) Stop() {
 	}()
 }
 func NewSuperVisor(maxWorkers uint) Supervisor {
+	startLogger()
 	pool := make(chan chan Job, maxWorkers)
 	return Supervisor{
 		MaxWorkers: maxWorkers,
@@ -95,6 +116,14 @@ func NewSuperVisor(maxWorkers uint) Supervisor {
 var JobQueue chan Job
 
 func (s Supervisor) Run() {
+	for i := 0; i < int(s.MaxWorkers); i++ {
+		woker := NewWorker(s.WorkerPool)
+		woker.Start()
+	}
+	go s.dispatch()
+}
+
+func (s Supervisor) dispatch() {
 	for {
 		select {
 		case job := <-JobQueue:

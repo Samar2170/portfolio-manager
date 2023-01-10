@@ -5,8 +5,7 @@ import (
 )
 
 func main() {
-	testNewService()
-	// RunServicesConcurrently()
+	RunServicesConcurrently()
 }
 
 func RunServicesConcurrently() {
@@ -17,9 +16,6 @@ func RunServicesConcurrently() {
 
 	wg.Add(1)
 	go RunSuperVisor()
-
-	wg.Add(1)
-	go testNewService()
 
 	wg.Wait()
 }
