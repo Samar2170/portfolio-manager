@@ -97,3 +97,4 @@ func UpdateNextIPDatesFDs() error {
 func (fd *FixedDeposit) Create() error {
 	return db.Create(&fd).Error
 }
+

@@ -1,7 +1,37 @@
 package main
 
+import (
+	"reflect"
+
+	"github.com/Samar2170/portfolio-manager/account"
+	"github.com/Samar2170/portfolio-manager/utils"
+)
+
 type Job interface {
 	Do() error
+}
+
+func NewJobRecord(j Job, success bool, errorString string) account.JobRecord {
+	refJob := reflect.TypeOf(j)
+	fields := reflect.VisibleFields(refJob)
+	fieldString := ""
+	for _, field := range fields {
+		fieldString += field.Name + ","
+	}
+	structMap := utils.Inspect(&j)
+	args := ""
+	for _, v := range structMap {
+		args += v
+	}
+	jr := account.JobRecord{
+		Name:    refJob.Name(),
+		Fields:  fieldString,
+		Args:    args,
+		Success: success,
+		Error:   errorString,
+	}
+	jr.Create()
+	return jr
 }
 
 type Worker struct {
@@ -32,7 +62,13 @@ func (w Worker) Start() {
 			select {
 			case job := <-w.JobChannel:
 
-				job.Do()
+				err := job.Do()
+				if err != nil {
+					NewJobRecord(job, false, err.Error())
+				} else {
+					NewJobRecord(job, true, "")
+				}
+
 			case <-w.quit:
 				return
 			}

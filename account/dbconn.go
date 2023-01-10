@@ -17,6 +17,8 @@ func connect() {
 	db.AutoMigrate(&GeneralAccount{})
 	db.AutoMigrate(&DematAccount{})
 	db.AutoMigrate(&BankAccount{})
+
+	db.AutoMigrate(&JobRecord{})
 }
 
 func handleError(err error) {

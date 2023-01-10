@@ -100,5 +100,7 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 
 // func ParseFDFile(fileId uint) error {
 // 	fdFile, err := getFDFileById(fileId)
-// 	return nil
+// 	if err != nil {
+// 		return err
+// 	}
 // }
