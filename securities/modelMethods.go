@@ -63,23 +63,30 @@ func CalculateNextIPDate(fd FixedDeposit) time.Time {
 	var nextIPDate time.Time
 	today := time.Now()
 	ipdate := fd.IPDate
-	currIpdate := time.Date(today.Year(), ipdate.Month(), ipdate.Day(), 0, 0, 0, 0, time.Local)
-	if currIpdate.Before(today) {
+	var currIpdate time.Time
+	if ipdate.Before(today) {
 		switch fd.IPFreq {
 		case "A":
-			nextIPDate = currIpdate.AddDate(1, 0, 0)
+			currIpdate = time.Date(today.Year(), ipdate.Month(), ipdate.Day(), 0, 0, 0, 0, time.Local)
+			if currIpdate.Before(today) {
+				nextIPDate = currIpdate.AddDate(1, 0, 0)
+			} else {
+				nextIPDate = currIpdate
+			}
+
 		case "M":
+			currIpdate = time.Date(today.Year(), today.Month(), ipdate.Day(), 0, 0, 0, 0, time.Local)
 			nextIPDate = currIpdate.AddDate(0, 1, 0)
 		case "Q":
-			nextIPDate = currIpdate.AddDate(0, 3, 0)
+			nextIPDate = utils.GetNextQuarter(today)
 		case "MT":
 			nextIPDate = fd.MtDate
 		case "SA":
-			nextIPDate = currIpdate.AddDate(0, 6, 0)
-		case "QAD":
-			nextIPDate = utils.GetNextQuarter(time.Now())
-		case "SAD":
-			nextIPDate = utils.GetNextHY(time.Now())
+			nextIPDate = utils.GetNextHY(today)
+			// case "QAD":
+			// 	nextIPDate = utils.GetNextQuarter(today)
+			// case "SAD":
+			// 	nextIPDate = utils.GetNextHY(today)
 		}
 	} else {
 		nextIPDate = currIpdate

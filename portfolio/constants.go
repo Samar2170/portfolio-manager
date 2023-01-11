@@ -39,11 +39,11 @@ var BankNames = map[string]struct{}{
 }
 
 var ValidIPFreqs = map[string]struct{}{
-	"A":   {},
-	"M":   {},
-	"MT":  {},
-	"Q":   {},
-	"SA":  {},
-	"QAD": {}, // quarterly adjusting, Bank format.
-	"SAD": {}, // semi annual adjusting, Govt format.
+	"A":  {},
+	"M":  {},
+	"MT": {},
+	"Q":  {},
+	"SA": {},
+	// "QAD": {}, // quarterly adjusting, Bank format.
+	// "SAD": {}, // semi annual adjusting, Govt format.
 }
