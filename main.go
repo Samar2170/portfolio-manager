@@ -1,15 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"sync"
-
-	"github.com/Samar2170/portfolio-manager/securities"
 )
 
 func main() {
-	// RunServicesConcurrently()
-	testNewService()
+	RunServicesConcurrently()
 }
 
 func RunServicesConcurrently() {
@@ -21,17 +17,16 @@ func RunServicesConcurrently() {
 	wg.Add(1)
 	go RunSuperVisor()
 
+	wg.Add(1)
+	go StartCronServer()
+
 	wg.Wait()
+
 }
 
-func testNewService() {
-	fd, _ := securities.GetFDByID(1091)
-	nipd := securities.CalculateNextIPDate(fd)
-
-	fmt.Println(fd)
-	fmt.Println(nipd)
-	// securities.UpdateNextIPDatesFDs()
-}
+// func testNewService() {
+// securities.UpdateNextIPDatesFDs()
+// }
 
 // func loadScripts() {
 // 	err := securities.LoadNiftyStocks()

@@ -96,15 +96,17 @@ func CalculateNextIPDate(fd FixedDeposit) time.Time {
 
 func UpdateNextIPDatesFDs() error {
 	var fds []FixedDeposit
+
 	err := db.Where("next_ip_date < CURRENT_DATE").Find(&fds).Error
 	if err != nil {
 		return err
 	}
-	for i, fd := range fds {
+
+	for _, fd := range fds {
 		nipd := CalculateNextIPDate(fd)
-		fmt.Println(i, fd, nipd)
+		err = db.Model(&fd).Where("id = ?", fd.ID).Update("next_ip_date", nipd).Error
 	}
-	return nil
+	return err
 }
 
 func (fd *FixedDeposit) Create() error {
