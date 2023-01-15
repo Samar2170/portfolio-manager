@@ -7,10 +7,14 @@ import (
 )
 
 const (
-	DtFormat = "2006-01-02"
+	DtFormat         = "2006-01-02"
+	SmtpAddress      = "smtp.gmail.com"
+	SmtpAddressWPort = "smtp.gmail.com:587"
 )
 
 var DBURI string
+var EMAILID string
+var EMAILPASSWORD string
 
 func loadConfigFile() {
 	viper.SetConfigFile(".env")
@@ -22,7 +26,10 @@ func loadConfigFile() {
 		viper.Get("DBNAME"),
 		viper.Get("DBPASSWORD"),
 	)
+	EMAILID = viper.GetString("EMAIL_ID")
+	EMAILPASSWORD = viper.GetString("EMAIL_PASSWORD")
 }
+
 func init() {
 	loadConfigFile()
 	connect()

@@ -2,10 +2,13 @@ package main
 
 import (
 	"sync"
+
+	"github.com/Samar2170/portfolio-manager/portfolio"
 )
 
 func main() {
-	RunServicesConcurrently()
+	// RunServicesConcurrently()
+	testNewService()
 }
 
 func RunServicesConcurrently() {
@@ -24,9 +27,9 @@ func RunServicesConcurrently() {
 
 }
 
-// func testNewService() {
-// securities.UpdateNextIPDatesFDs()
-// }
+func testNewService() {
+	portfolio.FindInterestDueFD()
+}
 
 // func loadScripts() {
 // 	err := securities.LoadNiftyStocks()

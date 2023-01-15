@@ -29,7 +29,10 @@ func StartCronServer() {
 
 	s.Every(1).Day().At("00:01:00").Do(func() {
 		cronLogger.Println("Running Update Next IP Date Job")
-		securities.UpdateNextIPDatesFDs()
+		err := securities.UpdateNextIPDatesFDs()
+		if err != nil {
+			cronLogger.Printf("Error occured while executing UpdateNextIPDatesFDs %s", err.Error())
+		}
 	})
 }
 

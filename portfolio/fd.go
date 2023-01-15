@@ -1,13 +1,18 @@
 package portfolio
 
 import (
+	"crypto/tls"
 	"errors"
+	"fmt"
 	"log"
+	"net/smtp"
+	"net/textproto"
 	"strings"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
+	"github.com/jordan-wright/email"
 )
 
 type FDFile struct {
@@ -98,9 +103,50 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 
 }
 
-// func ParseFDFile(fileId uint) error {
-// 	fdFile, err := getFDFileById(fileId)
-// 	if err != nil {
-// 		return err
-// 	}
-// }
+//	func ParseFDFile(fileId uint) error {
+//		fdFile, err := getFDFileById(fileId)
+//		if err != nil {
+//			return err
+//		}
+//	}
+type InterestDueFDResult struct {
+	Bank       string
+	Amount     float64
+	NextIPDate time.Time
+	UserId     uint
+	Email      string
+}
+
+func FindInterestDueFD() error {
+	t := time.Now()
+	t2 := t.AddDate(0, 0, 7)
+	var results []InterestDueFDResult
+	db.Raw("SELECT bank_accounts.bank, bank_accounts.user_id,users.email, fixed_deposits.amount, fixed_deposits.next_ip_date FROM fd_holdings LEFT JOIN fixed_deposits ON fixed_deposits.id = fixed_deposit_id LEFT JOIN bank_accounts ON bank_accounts.id = bank_account_id LEFT JOIN users ON users.id = bank_accounts.user_id WHERE fixed_deposits.next_ip_date >= ? AND fixed_deposits.next_ip_date <= ?", t, t2).Scan(&results)
+
+	emails := []*email.Email{}
+	for _, result := range results {
+		emails = append(emails, &email.Email{
+			To:      []string{result.Email},
+			From:    EMAILID,
+			Subject: "Interest Due",
+			Text:    []byte("Your Interest on FD is due"),
+			HTML:    []byte(""),
+			Headers: textproto.MIMEHeader{},
+		})
+	}
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         "localhost",
+	}
+
+	for _, msg := range emails {
+		fmt.Println(msg)
+		go func(msg *email.Email) {
+			err := msg.SendWithStartTLS(SmtpAddressWPort, smtp.PlainAuth("", EMAILID, EMAILPASSWORD, SmtpAddress), tlsconfig)
+			if err != nil {
+				log.Println(err)
+			}
+		}(msg)
+	}
+	return nil
+}
