@@ -13,6 +13,7 @@ import (
 
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
+	"github.com/Samar2170/portfolio-manager/utils"
 	"github.com/jordan-wright/email"
 )
 
@@ -156,3 +157,41 @@ func FindInterestDueFD() error {
 	Wg.Wait()
 	return nil
 }
+func calculateAccruedInterest(fd securities.FixedDeposit) float64 {
+	t := time.Now()
+	var daysDiff int
+	var intMultiple float64
+	annualInterest := fd.IPRate * fd.Amount
+	switch fd.IPFreq {
+	case "M":
+		daysDiff = int(t.Day())
+		intMultiple = float64(daysDiff) / 30 * 0.0833
+	case "Q":
+		cqDate := utils.GetCurrentQuarterFirstDate(t)
+		daysDiff = int(t.Sub(cqDate))
+		intMultiple = float64(daysDiff) / 90 * 0.25
+	case "SA":
+		cqDate := utils.GetCurrentHYFirstDate(t)
+		daysDiff = int(t.Sub(cqDate))
+		intMultiple = float64(daysDiff) / 180 * 0.5
+	case "A":
+		ipDate := time.Date(t.Year(), fd.StartDate.Month(), fd.StartDate.Day(), 0, 0, 0, 0, time.UTC)
+		if ipDate.After(t) {
+			delta := ipDate.Sub(t)
+			daysDiff = int(delta.Hours() / 24)
+			intMultiple = float64(daysDiff) / 365
+		} else {
+			ipDate = time.Date(t.Year()-1, fd.StartDate.Month(), fd.StartDate.Day(), 0, 0, 0, 0, time.UTC)
+			delta := t.Sub(ipDate)
+			daysDiff := int(delta / 24)
+			intMultiple = float64(daysDiff) / 365
+		}
+	}
+	accruedInt := annualInterest * intMultiple
+	return accruedInt
+
+}
+
+// func CalculateAccruedInterestAllFDs() {
+
+// }

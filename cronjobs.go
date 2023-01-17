@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Samar2170/portfolio-manager/portfolio"
 	"github.com/Samar2170/portfolio-manager/securities"
 	"github.com/go-co-op/gocron"
 )
@@ -33,6 +34,14 @@ func StartCronServer() {
 		if err != nil {
 			cronLogger.Printf("Error occured while executing UpdateNextIPDatesFDs %s", err.Error())
 		}
+	})
+	s.Every(1).Day().At("00:02:00").Do(func() {
+		cronLogger.Println("running find interest due fd")
+		err := portfolio.FindInterestDueFD()
+		if err != nil {
+			cronLogger.Printf("Error occured while executing FindInterestDueFDs %s", err.Error())
+		}
+
 	})
 }
 

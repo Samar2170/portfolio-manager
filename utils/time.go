@@ -4,6 +4,36 @@ import (
 	"time"
 )
 
+func GetCurrentQuarterFirstDate(t time.Time) time.Time {
+	y, m, _ := t.Date()
+	var cm int
+	switch m {
+	case 1, 2, 3:
+		cm = 1
+	case 4, 5, 6:
+		cm = 4
+	case 7, 8, 9:
+		cm = 7
+	case 10, 11, 12:
+		cm = 10
+	}
+	answer := time.Date(y, time.Month(cm), 1, 0, 0, 0, 0, time.UTC)
+	return answer
+}
+
+func GetCurrentHYFirstDate(t time.Time) time.Time {
+	y, m, _ := t.Date()
+	var cm int
+	switch m {
+	case 1, 2, 3, 4, 5, 6:
+		cm = 1
+	case 7, 8, 9, 10, 11, 12:
+		cm = 7
+	}
+	answer := time.Date(y, time.Month(cm), 1, 0, 0, 0, 0, time.UTC)
+	return answer
+}
+
 func GetNextQuarter(t time.Time) time.Time {
 	y, m, _ := t.Date()
 	qm, qy := findNearestQNext(y, int(m))
