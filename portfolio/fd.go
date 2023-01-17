@@ -8,6 +8,7 @@ import (
 	"net/smtp"
 	"net/textproto"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/account"
@@ -125,11 +126,12 @@ func FindInterestDueFD() error {
 
 	emails := []*email.Email{}
 	for _, result := range results {
+		msgText := fmt.Sprintf("Interest of FD of %d at Bank %s is Due on %s", int(result.Amount), result.Bank, result.NextIPDate.Format(time.ANSIC))
 		emails = append(emails, &email.Email{
 			To:      []string{result.Email},
 			From:    EMAILID,
 			Subject: "Interest Due",
-			Text:    []byte("Your Interest on FD is due"),
+			Text:    []byte(msgText),
 			HTML:    []byte(""),
 			Headers: textproto.MIMEHeader{},
 		})
@@ -138,15 +140,19 @@ func FindInterestDueFD() error {
 		InsecureSkipVerify: true,
 		ServerName:         "localhost",
 	}
+	var Wg sync.WaitGroup
+	Wg.Add(len(emails))
 
 	for _, msg := range emails {
 		fmt.Println(msg)
 		go func(msg *email.Email) {
+			defer Wg.Done()
 			err := msg.SendWithStartTLS(SmtpAddressWPort, smtp.PlainAuth("", EMAILID, EMAILPASSWORD, SmtpAddress), tlsconfig)
 			if err != nil {
 				log.Println(err)
 			}
 		}(msg)
 	}
+	Wg.Wait()
 	return nil
 }

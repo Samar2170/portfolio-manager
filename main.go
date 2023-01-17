@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
-	// RunServicesConcurrently()
-	testNewService()
+	RunServicesConcurrently()
 }
 
 func RunServicesConcurrently() {
