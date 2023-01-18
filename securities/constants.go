@@ -11,6 +11,7 @@ const (
 	BSEStocksFile    = "./Assets/BSEEquities.xlsx"
 	MFSchemesFile    = "./Assets/SchemeData2312221939SS.xlsx"
 	NSE500StocksFile = "./Assets/ind_nifty500list.xlsx"
+	BATCHSIZE        = 10
 )
 
 var ValidIPFreqs = map[string]struct{}{
