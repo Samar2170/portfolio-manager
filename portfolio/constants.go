@@ -45,7 +45,9 @@ var BankNames = map[string]struct{}{
 	"AXIS":     {},
 }
 
-var ValidIPFreqs = map[string]struct{}{
+type Set map[string]struct{}
+
+var ValidIPFreqs = Set{
 	"A":  {},
 	"M":  {},
 	"MT": {},
@@ -53,4 +55,21 @@ var ValidIPFreqs = map[string]struct{}{
 	"SA": {},
 	// "QAD": {}, // quarterly adjusting, Bank format.
 	// "SAD": {}, // semi annual adjusting, Govt format.
+}
+
+var ValidSecurities = Set{
+	"fd":    {},
+	"stock": {},
+	"ncd":   {},
+	"share": {},
+	"bond":  {},
+	"mf":    {},
+}
+
+func (m Set) Keys() string {
+	keys := ""
+	for k := range m {
+		keys += k + ","
+	}
+	return keys
 }

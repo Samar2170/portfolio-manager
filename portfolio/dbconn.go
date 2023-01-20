@@ -19,6 +19,7 @@ func connect() {
 	db.AutoMigrate(&MFHolding{})
 
 	db.AutoMigrate(&FDHolding{})
+	db.AutoMigrate(&FDFile{})
 }
 
 func handleError(err error) {

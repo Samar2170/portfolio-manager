@@ -2,13 +2,11 @@ package main
 
 import (
 	"sync"
-
-	"github.com/Samar2170/portfolio-manager/securities"
 )
 
 func main() {
-	// RunServicesConcurrently()
-	testNewService()
+	RunServicesConcurrently()
+	// testNewService()
 }
 
 func RunServicesConcurrently() {
@@ -27,16 +25,16 @@ func RunServicesConcurrently() {
 
 }
 
-func testNewService() {
-	// portfolio.FindInterestDueFD()
-	// fd, err := securities.GetFDByID(1091)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// aci := securities.CalculateAccruedInterest(fd)
-	// fmt.Println(aci)
-	securities.CalculateAccruedInterestAllFDs()
-}
+// func testNewService() {
+// portfolio.FindInterestDueFD()
+// fd, err := securities.GetFDByID(1091)
+// if err != nil {
+// 	log.Println(err)
+// }
+// aci := securities.CalculateAccruedInterest(fd)
+// fmt.Println(aci)
+// securities.CalculateAccruedInterestAllFDs()
+// }
 
 // func loadScripts() {
 // 	err := securities.LoadNiftyStocks()

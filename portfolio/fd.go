@@ -2,11 +2,14 @@ package portfolio
 
 import (
 	"crypto/tls"
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/smtp"
 	"net/textproto"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -105,9 +108,28 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 }
 
 func ParseFDFile(fileId uint) error {
-	_, err := getFDFileById(fileId)
+	// work pending on this/ ? should we go with one master file ?
+	fileData, err := getFDFileById(fileId)
 	if err != nil {
 		return err
+	}
+	file, err := os.Open(fileData.FilePath)
+	if err != nil {
+		return err
+	}
+	r := csv.NewReader(file)
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		for value := range record {
+			fmt.Println(value)
+		}
 	}
 	return nil
 }

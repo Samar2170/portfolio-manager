@@ -18,6 +18,8 @@ func StartApiServer() {
 	e.POST("/register-trade/mf", RegisterMFTrades)
 	e.POST("/register-fd", RegisterFD)
 
+	e.POST("/bulk-upload/:security", UploadFile)
+
 	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
 	e.GET("/securities/stocks/search", SearchStocks)
 	e.Use(middleware.Logger())
