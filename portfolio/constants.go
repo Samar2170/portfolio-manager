@@ -8,6 +8,7 @@ import (
 
 const (
 	DtFormat         = "2006-01-02"
+	FileDtFormat     = "02/01/2006"
 	SmtpAddress      = "smtp.gmail.com"
 	SmtpAddressWPort = "smtp.gmail.com:587"
 )

@@ -25,16 +25,10 @@ func RunServicesConcurrently() {
 
 }
 
-// func testNewService() {
-// portfolio.FindInterestDueFD()
-// fd, err := securities.GetFDByID(1091)
-// if err != nil {
-// 	log.Println(err)
-// }
-// aci := securities.CalculateAccruedInterest(fd)
-// fmt.Println(aci)
-// securities.CalculateAccruedInterestAllFDs()
-// }
+func testNewService() {
+	// portfolio.ParseFDFile(1)
+
+}
 
 // func loadScripts() {
 // 	err := securities.LoadNiftyStocks()

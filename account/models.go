@@ -106,3 +106,9 @@ func GetBankAccountByUserNBank(userId uint, bankName string) (BankAccount, error
 	err := db.Where("user_id = ? AND bank = ?", userId, bankName).Error
 	return ba, err
 }
+
+func CheckBankAccountAndUserId(userId uint, accountNumber string) bool {
+	var record BankAccount
+	err := db.Where("account_no = ? AND user_id = ?", accountNumber, userId).First(&record).Error
+	return err != gorm.ErrRecordNotFound
+}

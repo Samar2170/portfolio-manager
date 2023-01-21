@@ -5,11 +5,11 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/smtp"
 	"net/textproto"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -17,18 +17,23 @@ import (
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
 	"github.com/jordan-wright/email"
+	"gorm.io/gorm"
 )
 
 type FDFile struct {
-	Id       uint
-	User     account.User `gorm:"foreignKey:UserId"`
-	UserId   uint
-	FileName string
-	FilePath string
-	Parsed   bool
+	*gorm.Model
+	Id         uint
+	User       account.User `gorm:"foreignKey:UserId"`
+	UserId     uint
+	FileName   string
+	FilePath   string
+	Parsed     bool
+	RowsFailed []int
+	RowErrors  []string
 }
 
 type FDHolding struct {
+	*gorm.Model
 	ID             uint                    `gorm:"primaryKey"`
 	FixedDeposit   securities.FixedDeposit `gorm:"foreignKey:FixedDepositId"`
 	FixedDepositId uint
@@ -119,18 +124,77 @@ func ParseFDFile(fileId uint) error {
 	}
 	r := csv.NewReader(file)
 
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
+	if _, err := r.Read(); err != nil {
+		return err
+	}
+
+	failedRows := []int{}
+	errorRows := []string{}
+	records, err := r.ReadAll()
+	if err != nil {
+		return err
+	}
+	for i, record := range records {
+		err := createFDHoldingFromRow(record, fileData.UserId)
 		if err != nil {
-			return err
-		}
-		for value := range record {
-			fmt.Println(value)
+			errorRows = append(errorRows, err.Error())
+			failedRows = append(failedRows, i)
 		}
 	}
+	fileData.RowErrors = errorRows
+	fileData.RowsFailed = failedRows
+	fileData.Parsed = true
+	db.Save(&fileData)
+	return nil
+}
+
+func createFDHoldingFromRow(row []string, userId uint) error {
+	accNo, ipFreq := row[0], row[2]
+	amount, err := strconv.ParseFloat(row[1], 64)
+	if err != nil {
+		return err
+	}
+	ipRate, err := strconv.ParseFloat(row[3], 64)
+	if err != nil {
+		return err
+	}
+	mtAmount, err := strconv.ParseFloat(row[6], 64)
+	if err != nil {
+		return err
+	}
+	startDate, err := time.Parse(FileDtFormat, row[4])
+	if err != nil {
+		return err
+	}
+	endDate, err := time.Parse(FileDtFormat, row[5])
+	if err != nil {
+		return err
+	}
+	bankAccountUserMatch := account.CheckBankAccountAndUserId(userId, accNo)
+	if !bankAccountUserMatch {
+		return errors.New("bank account and users dont match")
+	}
+	fd := securities.FixedDeposit{
+		Amount:    amount,
+		IPFreq:    ipFreq,
+		IPRate:    ipRate,
+		MtAmount:  mtAmount,
+		MtDate:    endDate,
+		StartDate: startDate,
+	}
+	err = fd.Create()
+	if err != nil {
+		return err
+	}
+	ba, err := account.GetBankAccountByNumber(accNo)
+	if err != nil {
+		return err
+	}
+	fdh := FDHolding{
+		FixedDeposit: fd,
+		BankAccount:  ba,
+	}
+	fdh.create()
 	return nil
 }
 
