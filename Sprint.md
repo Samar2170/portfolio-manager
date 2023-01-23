@@ -20,3 +20,11 @@
 
 #### Bulk Upload
 * For Stocks, MF, Listed NCDs, FDs
+
+
+## MF Search
+*  search func -> try to match n words separately, avg score of words * n words = Ratio , we judge using this
+* eg -> DSP Overnight Fund 
+    * Remove fund from word
+    * match dsp and overnight
+    * 

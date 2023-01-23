@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"sync"
+
+	"github.com/Samar2170/portfolio-manager/portfolio"
 )
 
 func main() {
@@ -26,8 +29,10 @@ func RunServicesConcurrently() {
 }
 
 func testNewService() {
-	// portfolio.ParseFDFile(1)
-
+	err := portfolio.ParseFDFile(2)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 // func loadScripts() {

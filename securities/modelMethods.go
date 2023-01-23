@@ -18,17 +18,6 @@ func GetAllStocks() ([]Stock, error) {
 	return stocks, err
 }
 
-func (mf MutualFund) create() error {
-	err := db.Create(&mf).Error
-	return err
-}
-
-func GetAllMutualFunds() ([]MutualFund, error) {
-	var mfs []MutualFund
-	err := db.Find(&mfs).Error
-	return mfs, err
-}
-
 func GetStockBySymbol(symbol string) (Stock, error) {
 	var stock Stock
 	err := db.First(&stock, "symbol = ?", symbol).Error
@@ -39,16 +28,4 @@ func SearchStockSymbol(symbol string, pagination utils.Pagination) (*utils.Pagin
 	var stocks []*Stock
 	err := db.Scopes(utils.Paginate(stocks, &pagination, db)).Where("symbol ILIKE ?", "%"+symbol+"%").Find(&stocks).Error
 	return &pagination, stocks, err
-}
-
-func SearchMutualFunds(symbol string, pagination utils.Pagination) (*utils.Pagination, []*MutualFund, error) {
-	var mfs []*MutualFund
-	err := db.Scopes(utils.Paginate(mfs, &pagination, db)).Where("scheme_nav_name ILIKE ?", "%"+symbol+"%").Find(&mfs).Error
-	return &pagination, mfs, err
-}
-
-func GetMutualFundById(mfId uint) (MutualFund, error) {
-	var mf MutualFund
-	err := db.First(&mf, "id = ?", mfId).Error
-	return mf, err
 }

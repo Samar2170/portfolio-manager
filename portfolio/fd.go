@@ -17,6 +17,7 @@ import (
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
 	"github.com/jordan-wright/email"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -28,8 +29,8 @@ type FDFile struct {
 	FileName   string
 	FilePath   string
 	Parsed     bool
-	RowsFailed []int
-	RowErrors  []string
+	RowsFailed pq.Int64Array  `gorm:"type:integer[]"`
+	RowErrors  pq.StringArray `gorm:"type:varchar[]"`
 }
 
 type FDHolding struct {
@@ -128,7 +129,7 @@ func ParseFDFile(fileId uint) error {
 		return err
 	}
 
-	failedRows := []int{}
+	failedRows := []int64{}
 	errorRows := []string{}
 	records, err := r.ReadAll()
 	if err != nil {
@@ -138,7 +139,7 @@ func ParseFDFile(fileId uint) error {
 		err := createFDHoldingFromRow(record, fileData.UserId)
 		if err != nil {
 			errorRows = append(errorRows, err.Error())
-			failedRows = append(failedRows, i)
+			failedRows = append(failedRows, int64(i))
 		}
 	}
 	fileData.RowErrors = errorRows

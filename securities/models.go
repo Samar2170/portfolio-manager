@@ -39,18 +39,6 @@ type Crypto struct {
 	Exchange string
 }
 
-type MutualFund struct {
-	*gorm.Model
-	ID             uint `gorm:"primaryKey"`
-	AMC            string
-	Code           string
-	SchemeName     string
-	SchemeType     string
-	SchemeCategory string
-	SchemeNAVName  string `gorm:"unique"`
-	Category       string
-}
-
 type UnlistedNCD struct {
 	*gorm.Model
 	ID            uint `gorm:"primaryKey"`

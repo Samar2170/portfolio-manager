@@ -8,7 +8,43 @@ import (
 
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
+	"github.com/lib/pq"
+	"gorm.io/gorm"
 )
+
+type StockTrade struct {
+	*gorm.Model
+	TradeDate      time.Time
+	Stock          securities.Stock `gorm:"foreignKey:StockId"`
+	StockId        uint
+	Quantity       uint
+	Price          float64
+	TradeType      string
+	DematAccount   account.DematAccount `gorm:"foreignKey:DematAccountId"`
+	DematAccountId uint
+}
+
+type StockHolding struct {
+	*gorm.Model
+	Stock          securities.Stock `gorm:"foreignKey:StockId"`
+	StockId        uint
+	Quantity       uint
+	Price          float64
+	DematAccount   account.DematAccount `gorm:"foreignKey:DematAccountId"`
+	DematAccountId uint
+}
+
+type StockFile struct {
+	*gorm.Model
+	Id         uint
+	User       account.User `gorm:"foreignKey:UserId"`
+	UserId     uint
+	FileName   string
+	FilePath   string
+	Parsed     bool
+	RowsFailed pq.Int64Array  `gorm:"type:integer[]"`
+	RowErrors  pq.StringArray `gorm:"type:varchar[]"`
+}
 
 func (st StockTrade) Create() error {
 	err := db.Create(&st).Error

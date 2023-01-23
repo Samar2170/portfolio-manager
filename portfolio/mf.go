@@ -1,13 +1,17 @@
 package portfolio
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/account"
 	"github.com/Samar2170/portfolio-manager/securities"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -30,6 +34,18 @@ type MFHolding struct {
 	Price          float64
 	DematAccount   account.DematAccount `gorm:"foreignKey:DematAccountId"`
 	DematAccountId uint
+}
+
+type MFFile struct {
+	*gorm.Model
+	Id         uint
+	User       account.User `gorm:"foreignKey:UserId"`
+	UserId     uint
+	FileName   string
+	FilePath   string
+	Parsed     bool
+	RowsFailed pq.Int64Array  `gorm:"type:integer[]"`
+	RowErrors  pq.StringArray `gorm:"type:varchar[]"`
 }
 
 func (mft MFTrade) Create() error {
@@ -123,4 +139,84 @@ func RegisterMFTrade(mft MFTrade) error {
 		}
 	}
 	return nil
+}
+
+func (mff MFFile) Create() error {
+	err := db.Create(&mff).Error
+	return err
+}
+
+func getMFFIleById(fileId uint) (MFFile, error) {
+	var mff MFFile
+	err := db.First(&mff, "id = ?").Error
+	return mff, err
+}
+
+func CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate string) (MFTrade, error) {
+	var err error
+	var tradeDateParsed time.Time
+	mfIdInt, err := strconv.ParseInt(mfId, 10, 64)
+	if err != nil {
+		return MFTrade{}, errors.New("mutual_fund_id should be a number")
+	}
+
+	if tradeDate == "" {
+		tradeDateParsed = time.Now()
+	} else {
+		tradeDateParsed, err = time.Parse(DtFormat, tradeDate)
+		if err != nil {
+			return MFTrade{}, errors.New("trade date should be in format 2022-11-22")
+		}
+	}
+	quantityFloat, err := strconv.ParseFloat(quantity, 64)
+	if err != nil {
+		return MFTrade{}, errors.New("quantity should be a number")
+	}
+	priceFloat, err := strconv.Atoi(price)
+	if err != nil {
+		return MFTrade{}, errors.New("price should be a number")
+	}
+	mfTrade, err := NewMFTrade(uint(mfIdInt), tradeType, dematAccCode, quantityFloat, float64(priceFloat), tradeDateParsed)
+	if err != nil {
+		return MFTrade{}, err
+	}
+	err = RegisterMFTrade(*mfTrade)
+	if err != nil {
+		return MFTrade{}, err
+	}
+	return *mfTrade, nil
+}
+
+func ParseMFFIle(fileId uint) error {
+	fileData, err := getMFFIleById(fileId)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(fileData.FilePath)
+	if err != nil {
+		return err
+	}
+	r := csv.NewReader(file)
+	if _, err := r.Read(); err != nil {
+		return err
+	}
+	failedRows := []int64{}
+	errorRows := []string{}
+	records, err := r.ReadAll()
+	if err != nil {
+		return err
+	}
+	for i, record := range records {
+		_, err := CreateMFTrade(record[0], record[1], record[2], record[3], record[4], record[5])
+		if err != nil {
+			errorRows = append(errorRows, err.Error())
+			failedRows = append(failedRows, int64(i))
+		}
+	}
+	fileData.RowErrors = errorRows
+	fileData.RowsFailed = failedRows
+	fileData.Parsed = true
+	db.Save(&fileData)
+	return nil
+
 }
