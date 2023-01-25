@@ -148,7 +148,7 @@ func (mff MFFile) Create() error {
 
 func getMFFIleById(fileId uint) (MFFile, error) {
 	var mff MFFile
-	err := db.First(&mff, "id = ?").Error
+	err := db.First(&mff, "id = ?", fileId).Error
 	return mff, err
 }
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/portfolio"
@@ -19,7 +18,7 @@ const (
 func RegisterStockTrades(c echo.Context) error {
 	var err error
 	stockSymbol := c.FormValue("symbol")
-	stockSymbol = strings.ToUpper(stockSymbol)
+	// stockSymbol = strings.ToUpper(stockSymbol)
 	dematAccCode := c.FormValue("demat")
 	quantity := c.FormValue("quantity")
 	price := c.FormValue("price")

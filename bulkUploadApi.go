@@ -19,8 +19,27 @@ type Response struct {
 }
 
 const (
-	UPLOADFILES_DIR = "upload_files/"
+	UPLOADFILES_DIR  = "upload_files/"
+	FD_TEMPLATE_FILE = "FDBUTemp.csv"
+	MF_TEMPLATE_FILE = "MFTradeBUTemp.csv"
 )
+
+func DownloadTemplateFile(c echo.Context) error {
+	security := c.Param("security")
+	if _, ok := portfolio.ValidSecurities[security]; !ok {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: fmt.Sprintf("Bad Security Parameter, Valid choices are %s", portfolio.ValidSecurities.Keys()),
+		})
+	}
+	switch security {
+	case "fd":
+		return c.File(UPLOADFILES_DIR + FDTemplateFile)
+	case "mf":
+		return c.File(UPLOADFILES_DIR + MF_TEMPLATE_FILE)
+
+	}
+	return nil
+}
 
 // Save the file -> trigger task to parse -> save entries
 //
@@ -74,6 +93,22 @@ func UploadFile(c echo.Context) error {
 	switch security {
 	case "fd":
 		fileData := portfolio.FDFile{
+			UserId:   user.Id,
+			FileName: fileName,
+			FilePath: UPLOADFILES_DIR + fileName,
+			Parsed:   false,
+		}
+		fileData.Create()
+	case "mf":
+		fileData := portfolio.MFFile{
+			UserId:   user.Id,
+			FileName: fileName,
+			FilePath: UPLOADFILES_DIR + fileName,
+			Parsed:   false,
+		}
+		fileData.Create()
+	case "stock", "stocks", "shares":
+		fileData := portfolio.StockFile{
 			UserId:   user.Id,
 			FileName: fileName,
 			FilePath: UPLOADFILES_DIR + fileName,

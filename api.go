@@ -19,6 +19,7 @@ func StartApiServer() {
 	e.POST("/register-fd", RegisterFD)
 
 	e.POST("/bulk-upload/:security", UploadFile)
+	e.POST("bulk-upload-template/:security", DownloadTemplateFile)
 
 	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
 	e.GET("/securities/stocks/search", SearchStocks)

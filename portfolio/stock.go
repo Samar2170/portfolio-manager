@@ -1,8 +1,11 @@
 package portfolio
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -139,5 +142,78 @@ func RegisterTrade(nst StockTrade) error {
 			return errors.New("no Holding found to sell")
 		}
 	}
+	return nil
+}
+
+func (sf StockFile) Create() error {
+	err := db.Create(&sf).Error
+	return err
+}
+func GetStockFileById(sfId uint) (StockFile, error) {
+	var stockFile StockFile
+	err := db.First(&stockFile, "id = ?", sfId).Error
+	return stockFile, err
+}
+
+func CreateStockTrade(symbol, dematAccCode, quantity, price, tradeType, tradeDate string) (StockTrade, error) {
+	var err error
+	var tradeDateParsed time.Time
+	symbol = strings.ToUpper(symbol)
+	if err != nil {
+		return StockTrade{}, err
+	}
+	if tradeDate == "" {
+		tradeDateParsed = time.Now()
+	} else {
+		tradeDateParsed, err = time.Parse(DtFormat, tradeDate)
+		if err != nil {
+			return StockTrade{}, errors.New("trade date should be in format 2022-11-22")
+		}
+	}
+	quantityFloat, err := strconv.ParseFloat(quantity, 64)
+	if err != nil {
+		return StockTrade{}, errors.New("quantity should be a number")
+	}
+	priceFloat, err := strconv.Atoi(price)
+	if err != nil {
+		return StockTrade{}, errors.New("price should be a number")
+	}
+	stockTrade, err := NewStockTrade(symbol, tradeType, dematAccCode, uint(quantityFloat), float64(priceFloat), tradeDateParsed)
+	if err != nil {
+		return StockTrade{}, errors.New(err.Error())
+	}
+	err = RegisterTrade(*stockTrade)
+	return *stockTrade, err
+}
+func ParseStockFile(fileId uint) error {
+	fileData, err := GetStockFileById(fileId)
+	if err != nil {
+		return err
+	}
+	file, err := os.Open(fileData.FilePath)
+	if err != nil {
+		return err
+	}
+	r := csv.NewReader(file)
+	if _, err := r.Read(); err != nil {
+		return err
+	}
+	failedRows := []int64{}
+	errorRows := []string{}
+	records, err := r.ReadAll()
+	if err != nil {
+		return err
+	}
+	for i, record := range records {
+		_, err := CreateStockTrade(record[0], record[1], record[2], record[3], record[4], record[5])
+		if err != nil {
+			errorRows = append(errorRows, err.Error())
+			failedRows = append(failedRows, int64(i))
+		}
+	}
+	fileData.RowErrors = errorRows
+	fileData.RowsFailed = failedRows
+	fileData.Parsed = true
+	db.Save(&fileData)
 	return nil
 }
