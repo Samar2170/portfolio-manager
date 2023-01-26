@@ -3,5 +3,5 @@ Feature: login
 
     Scenario: Login using username and password
         Given i signup
-        Then i login
+        Then i login 
         
