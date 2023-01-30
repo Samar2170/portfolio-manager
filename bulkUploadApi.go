@@ -19,9 +19,10 @@ type Response struct {
 }
 
 const (
-	UPLOADFILES_DIR  = "upload_files/"
-	FD_TEMPLATE_FILE = "FDBUTemp.csv"
-	MF_TEMPLATE_FILE = "MFTradeBUTemp.csv"
+	UPLOADFILES_DIR     = "upload_files/"
+	FD_TEMPLATE_FILE    = "FDBUTemp.csv"
+	MF_TEMPLATE_FILE    = "MFTradeBUTemp.csv"
+	STOCK_TEMPLATE_FILE = "StockTradeBUTemp.csv"
 )
 
 func DownloadTemplateFile(c echo.Context) error {
@@ -33,10 +34,11 @@ func DownloadTemplateFile(c echo.Context) error {
 	}
 	switch security {
 	case "fd":
-		return c.File(UPLOADFILES_DIR + FDTemplateFile)
+		return c.File(UPLOADFILES_DIR + FD_TEMPLATE_FILE)
 	case "mf":
 		return c.File(UPLOADFILES_DIR + MF_TEMPLATE_FILE)
-
+	case "stock", "stocks", "shares":
+		return c.File(UPLOADFILES_DIR + STOCK_TEMPLATE_FILE)
 	}
 	return nil
 }
@@ -98,7 +100,14 @@ func UploadFile(c echo.Context) error {
 			FilePath: UPLOADFILES_DIR + fileName,
 			Parsed:   false,
 		}
-		fileData.Create()
+		fd, err := fileData.Create()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Response{
+				Message: err.Error(),
+			})
+		}
+		pffj := ParseFDFileJob{FileId: fd.ID}
+		JobQueue <- pffj
 	case "mf":
 		fileData := portfolio.MFFile{
 			UserId:   user.Id,
@@ -106,7 +115,14 @@ func UploadFile(c echo.Context) error {
 			FilePath: UPLOADFILES_DIR + fileName,
 			Parsed:   false,
 		}
-		fileData.Create()
+		fd, err := fileData.Create()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Response{
+				Message: err.Error(),
+			})
+		}
+		pmfj := ParseMFFileJob{FileId: fd.ID}
+		JobQueue <- pmfj
 	case "stock", "stocks", "shares":
 		fileData := portfolio.StockFile{
 			UserId:   user.Id,
@@ -114,7 +130,14 @@ func UploadFile(c echo.Context) error {
 			FilePath: UPLOADFILES_DIR + fileName,
 			Parsed:   false,
 		}
-		fileData.Create()
+		fd, err := fileData.Create()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Response{
+				Message: err.Error(),
+			})
+		}
+		psfj := ParseStockFileJob{FileId: fd.ID}
+		JobQueue <- psfj
 	}
 	return c.JSON(http.StatusAccepted, Response{
 		Message: "File Successfully Uploaded",

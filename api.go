@@ -7,6 +7,10 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!")
+}
+
 func StartApiServer() {
 	e := echo.New()
 	e.POST("/signup", signup)
@@ -17,6 +21,8 @@ func StartApiServer() {
 	e.POST("/register-trade/stock", RegisterStockTrades)
 	e.POST("/register-trade/mf", RegisterMFTrades)
 	e.POST("/register-fd", RegisterFD)
+
+	e.GET("/view-accounts", ViewAccounts)
 
 	e.POST("/bulk-upload/:security", UploadFile)
 	e.POST("bulk-upload-template/:security", DownloadTemplateFile)
@@ -37,9 +43,7 @@ func StartApiServer() {
 		},
 	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	e.GET("/", hello)
 	e.Logger.Fatal(e.Start(":1323"))
 
 }

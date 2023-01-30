@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Samar2170/portfolio-manager/account"
+	"github.com/Samar2170/portfolio-manager/portfolio"
 	"github.com/Samar2170/portfolio-manager/utils"
 )
 
@@ -37,3 +38,26 @@ func (cuas CreateUserAccountStatusJob) Do() error {
 }
 
 const GACodeLen = 8
+
+type ParseFDFileJob struct {
+	FileId uint
+}
+type ParseStockFileJob struct {
+	FileId uint
+}
+type ParseMFFileJob struct {
+	FileId uint
+}
+
+func (pffj ParseFDFileJob) Do() error {
+	err := portfolio.ParseFDFile(pffj.FileId)
+	return err
+}
+func (psfj ParseStockFileJob) Do() error {
+	err := portfolio.ParseStockFile(psfj.FileId)
+	return err
+}
+func (pmfj ParseMFFileJob) Do() error {
+	err := portfolio.ParseStockFile(pmfj.FileId)
+	return err
+}

@@ -117,3 +117,49 @@ func RegisterBankAccounts(c echo.Context) error {
 			"message": "Bank Account Created",
 		})
 }
+
+func ViewAccounts(c echo.Context) error {
+	accountType := c.FormValue("type")
+	// if accountType != "bank" && accountType != "demat" {
+	// 	return c.JSON(http.StatusBadRequest, Response{
+	// 		Message: "type parameter should bank or demat",
+	// 	})
+	// }
+
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusForbidden, Response{Message: "Please log in"})
+	}
+	dataResponse := make(map[string]interface{})
+
+	switch accountType {
+	case "bank":
+		bankAccounts, err := account.GetBankAccountsByUser(user.Id)
+		if err != nil {
+			return c.JSON(http.StatusForbidden, Response{Message: err.Error()})
+		}
+		dataResponse["bank_accounts"] = bankAccounts
+	case "demat":
+		dematAccounts, err := account.GetDematAccountsByUser(user.Id)
+		if err != nil {
+			return c.JSON(http.StatusForbidden, Response{Message: err.Error()})
+		}
+		dataResponse["demat_accounts"] = dematAccounts
+	default:
+		dematAccounts, err := account.GetDematAccountsByUser(user.Id)
+		if err != nil {
+			return c.JSON(http.StatusForbidden, Response{Message: err.Error()})
+		}
+		bankAccounts, err := account.GetBankAccountsByUser(user.Id)
+		if err != nil {
+			return c.JSON(http.StatusForbidden, Response{Message: err.Error()})
+		}
+		dataResponse["bank_accounts"] = bankAccounts
+		dataResponse["demat_accounts"] = dematAccounts
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		Message: "Good",
+		Data:    dataResponse,
+	})
+}
