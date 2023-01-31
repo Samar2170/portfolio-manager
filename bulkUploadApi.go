@@ -106,7 +106,7 @@ func UploadFile(c echo.Context) error {
 				Message: err.Error(),
 			})
 		}
-		pffj := ParseFDFileJob{FileId: fd.ID}
+		pffj := ParseFDFileJob{FileId: fd.Id}
 		JobQueue <- pffj
 	case "mf":
 		fileData := portfolio.MFFile{
@@ -121,7 +121,7 @@ func UploadFile(c echo.Context) error {
 				Message: err.Error(),
 			})
 		}
-		pmfj := ParseMFFileJob{FileId: fd.ID}
+		pmfj := ParseMFFileJob{FileId: fd.Id}
 		JobQueue <- pmfj
 	case "stock", "stocks", "shares":
 		fileData := portfolio.StockFile{
@@ -136,7 +136,7 @@ func UploadFile(c echo.Context) error {
 				Message: err.Error(),
 			})
 		}
-		psfj := ParseStockFileJob{FileId: fd.ID}
+		psfj := ParseStockFileJob{FileId: fd.Id}
 		JobQueue <- psfj
 	}
 	return c.JSON(http.StatusAccepted, Response{

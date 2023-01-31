@@ -47,11 +47,11 @@ func (fdh *FDHolding) create() error {
 	return err
 }
 
-func (fdf FDFile) Create() error {
+func (fdf FDFile) Create() (FDFile, error) {
 	err := db.Create(&fdf).Error
-	return err
+	return fdf, err
 }
-func getFDFileById(fileId uint) (FDFile, error) {
+func GetFDFileById(fileId uint) (FDFile, error) {
 	var fdf FDFile
 	err := db.First(&fdf, "id = ?", fileId).Error
 	return fdf, err
@@ -115,7 +115,7 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 
 func ParseFDFile(fileId uint) error {
 	// work pending on this/ ? should we go with one master file ?
-	fileData, err := getFDFileById(fileId)
+	fileData, err := GetFDFileById(fileId)
 	if err != nil {
 		return err
 	}
