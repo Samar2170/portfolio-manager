@@ -4,74 +4,43 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/Samar2170/portfolio-manager/portfolio"
+	"github.com/Samar2170/portfolio-manager/utils"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
 const (
-	DtFormat       = "2006-01-02"
-	FDTemplateFile = "Assets/templates/FDBUTemp.csv"
+	DtFormat = "2006-01-02"
 )
 
 func RegisterStockTrades(c echo.Context) error {
 	var err error
 	stockSymbol := c.FormValue("symbol")
-	// stockSymbol = strings.ToUpper(stockSymbol)
 	dematAccCode := c.FormValue("demat")
 	quantity := c.FormValue("quantity")
 	price := c.FormValue("price")
 	tradeType := c.FormValue("trade_type")
 	tradeDate := c.FormValue("trade_date")
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
 	if stockSymbol == "" || dematAccCode == "" || tradeType == "" || quantity == "" || price == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": "all fields should be non empty (symbol,demat,quantity,price,trade_type)",
 		})
 	}
-	var tradeDateParsed time.Time
-	if tradeDate == "" {
-		tradeDateParsed = time.Now()
-	} else {
-		tradeDateParsed, err = time.Parse(DtFormat, tradeDate)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{
-				"message": "Trade date should be in format 2022-11-22",
-			})
-		}
-	}
-
-	fmt.Println(tradeDate)
-	quantityInt, err := strconv.ParseInt(quantity, 10, 64)
+	_, err = portfolio.CreateStockTrade(stockSymbol, dematAccCode, quantity, price, tradeType, tradeDate, user.Id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "quantity should be a number",
-		})
-	}
-	priceFloat, err := strconv.Atoi(price)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "price should be a number",
-		})
-	}
-
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": "trade_date should be in format 2022-11-22",
-		})
-	}
-
-	stockTrade, err := portfolio.NewStockTrade(stockSymbol, tradeType, dematAccCode, uint(quantityInt), float64(priceFloat), tradeDateParsed)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": err.Error(),
-		})
-	}
-	err = portfolio.RegisterTrade(*stockTrade)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"message": err.Error(),
-		})
+		return c.JSON(
+			http.StatusBadRequest, Response{
+				Message: err.Error(),
+			},
+		)
 	}
 	return c.JSON(http.StatusAccepted, map[string]string{
 		"message": "trade registered successfully",
@@ -81,23 +50,23 @@ func RegisterStockTrades(c echo.Context) error {
 func RegisterMFTrades(c echo.Context) error {
 	var err error
 	mfId := c.FormValue("mutual_fund_id")
-	// mfIdInt, err := strconv.ParseInt(mfId, 10, 64)
-	// if err != nil {
-	// return c.JSON(http.StatusBadRequest, map[string]string{
-	// "message": "mutual_fund_id should be a number",
-	// })
-	// }
 	dematAccCode := c.FormValue("demat")
 	quantity := c.FormValue("quantity")
 	price := c.FormValue("price")
 	tradeType := c.FormValue("trade_type")
 	tradeDate := c.FormValue("trade_date")
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
 	if mfId == "" || dematAccCode == "" || tradeType == "" || quantity == "" || price == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": "all fields should be non empty (mutual_fund_id,demat,quantity,price,trade_type)",
 		})
 	}
-	_, err = portfolio.CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate)
+	_, err = portfolio.CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate, user.Id)
 	if err != nil {
 		return c.JSON(
 			http.StatusConflict, Response{
@@ -110,47 +79,6 @@ func RegisterMFTrades(c echo.Context) error {
 			Message: "trade registered successfully",
 		})
 
-	//  kept for contigency purposes
-	// var tradeDateParsed time.Time
-	// if tradeDate == "" {
-	// 	tradeDateParsed = time.Now()
-	// } else {
-	// 	tradeDateParsed, err = time.Parse(DtFormat, tradeDate)
-	// 	if err != nil {
-	// 		return c.JSON(http.StatusBadRequest, map[string]string{
-	// 			"message": "Trade date should be in format 2022-11-22",
-	// 		})
-	// 	}
-	// }
-
-	// quantityFloat, err := strconv.ParseFloat(quantity, 64)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]string{
-	// 		"message": "quantity should be a number",
-	// 	})
-	// }
-	// priceFloat, err := strconv.Atoi(price)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]string{
-	// 		"message": "price should be a number",
-	// 	})
-	// }
-
-	// mfTrade, err := portfolio.NewMFTrade(uint(mfIdInt), tradeType, dematAccCode, quantityFloat, float64(priceFloat), tradeDateParsed)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]string{
-	// 		"message": err.Error(),
-	// 	})
-	// }
-	// err = portfolio.RegisterMFTrade(*mfTrade)
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, map[string]string{
-	// 		"message": err.Error(),
-	// 	})
-	// }
-	// return c.JSON(http.StatusAccepted, map[string]string{
-	// 	"message": "trade registered successfully",
-	// })
 }
 
 func RegisterFD(c echo.Context) error {
@@ -170,6 +98,7 @@ func RegisterFD(c echo.Context) error {
 	}
 	mtDate := c.FormValue("maturity_date")
 	accNumber := c.FormValue("account_number")
+	// user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 
 	if ipDate == "" {
 		ipDate = startDate
@@ -209,8 +138,4 @@ func RegisterFD(c echo.Context) error {
 		"message": fmt.Sprintf("FD created successfully with ID %d", fdh.ID),
 	})
 
-}
-
-func DownloadFDBulkUploadFile(c echo.Context) error {
-	return c.File(FDTemplateFile)
 }

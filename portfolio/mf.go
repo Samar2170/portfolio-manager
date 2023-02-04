@@ -141,9 +141,9 @@ func RegisterMFTrade(mft MFTrade) error {
 	return nil
 }
 
-func (mff MFFile) Create() error {
+func (mff MFFile) Create() (MFFile, error) {
 	err := db.Create(&mff).Error
-	return err
+	return mff, err
 }
 
 func getMFFIleById(fileId uint) (MFFile, error) {
@@ -152,7 +152,11 @@ func getMFFIleById(fileId uint) (MFFile, error) {
 	return mff, err
 }
 
-func CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate string) (MFTrade, error) {
+func CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate string, userId uint) (MFTrade, error) {
+	isValid := account.CheckDematAccountAndUserId(userId, dematAccCode)
+	if !isValid {
+		return MFTrade{}, fmt.Errorf("demat %s & User Id %d dont match", dematAccCode, userId)
+	}
 	var err error
 	var tradeDateParsed time.Time
 	mfIdInt, err := strconv.ParseInt(mfId, 10, 64)
@@ -207,7 +211,7 @@ func ParseMFFIle(fileId uint) error {
 		return err
 	}
 	for i, record := range records {
-		_, err := CreateMFTrade(record[0], record[1], record[2], record[3], record[4], record[5])
+		_, err := CreateMFTrade(record[0], record[1], record[2], record[3], record[4], record[5], fileData.UserId)
 		if err != nil {
 			errorRows = append(errorRows, err.Error())
 			failedRows = append(failedRows, int64(i))

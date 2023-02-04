@@ -112,6 +112,12 @@ func CheckBankAccountAndUserId(userId uint, accountNumber string) bool {
 	err := db.Where("account_no = ? AND user_id = ?", accountNumber, userId).First(&record).Error
 	return err != gorm.ErrRecordNotFound
 }
+func CheckDematAccountAndUserId(userId uint, dematAccCode string) bool {
+	var record DematAccount
+	err := db.Where("account_no = ? AND user_id = ?", dematAccCode, userId).First(&record).Error
+	return err != gorm.ErrRecordNotFound
+}
+
 func GetBankAccountsByUser(userId uint) ([]BankAccount, error) {
 	var accounts []BankAccount
 	err := db.Where("user_id = ?", userId).Find(&accounts).Error

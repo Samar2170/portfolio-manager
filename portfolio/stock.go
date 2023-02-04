@@ -155,7 +155,11 @@ func GetStockFileById(sfId uint) (StockFile, error) {
 	return stockFile, err
 }
 
-func CreateStockTrade(symbol, dematAccCode, quantity, price, tradeType, tradeDate string) (StockTrade, error) {
+func CreateStockTrade(symbol, dematAccCode, quantity, price, tradeType, tradeDate string, userId uint) (StockTrade, error) {
+	isValid := account.CheckDematAccountAndUserId(userId, dematAccCode)
+	if !isValid {
+		return StockTrade{}, fmt.Errorf("demat Account Code %s does not belong to user id %d", dematAccCode, userId)
+	}
 	var err error
 	var tradeDateParsed time.Time
 	symbol = strings.ToUpper(symbol)
@@ -187,6 +191,7 @@ func CreateStockTrade(symbol, dematAccCode, quantity, price, tradeType, tradeDat
 }
 func ParseStockFile(fileId uint) error {
 	fileData, err := GetStockFileById(fileId)
+	userId := fileData.UserId
 	if err != nil {
 		return err
 	}
@@ -205,7 +210,7 @@ func ParseStockFile(fileId uint) error {
 		return err
 	}
 	for i, record := range records {
-		_, err := CreateStockTrade(record[0], record[1], record[2], record[3], record[4], record[5])
+		_, err := CreateStockTrade(record[0], record[1], record[2], record[3], record[4], record[5], userId)
 		if err != nil {
 			errorRows = append(errorRows, err.Error())
 			failedRows = append(failedRows, int64(i))
