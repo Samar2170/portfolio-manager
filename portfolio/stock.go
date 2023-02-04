@@ -62,15 +62,15 @@ func (sh StockHolding) Create() error {
 func NewStockTrade(symbol, tradeType, dematAccountCode string, quantity uint, price float64, tradeDate time.Time) (*StockTrade, error) {
 	tradeTypeCap := strings.ToUpper(tradeType)
 	if tradeTypeCap != "BUY" && tradeTypeCap != "SELL" {
-		return &StockTrade{}, errors.New("trade type should be buy or sell")
+		return &StockTrade{}, fmt.Errorf("trade type should be buy or sell not %s", tradeType)
 	}
 	stock, err := securities.GetStockBySymbol(symbol)
 	if err != nil {
-		return &StockTrade{}, errors.New("unable to find stock please check the symbol provided")
+		return &StockTrade{}, fmt.Errorf("unable to find stock %s please check the symbol provided", symbol)
 	}
 	da, err := account.GetDematAccountByCode(dematAccountCode)
 	if err != nil {
-		return &StockTrade{}, errors.New("demat Account Code is not valid.Please Check")
+		return &StockTrade{}, fmt.Errorf("demat Account Code %s is not valid.Please Check", dematAccountCode)
 	}
 	return &StockTrade{
 		Stock:        stock,
@@ -145,9 +145,9 @@ func RegisterTrade(nst StockTrade) error {
 	return nil
 }
 
-func (sf StockFile) Create() error {
+func (sf StockFile) Create() (StockFile, error) {
 	err := db.Create(&sf).Error
-	return err
+	return sf, err
 }
 func GetStockFileById(sfId uint) (StockFile, error) {
 	var stockFile StockFile

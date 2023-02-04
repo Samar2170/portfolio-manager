@@ -20,6 +20,8 @@ func connect() {
 
 	db.AutoMigrate(&FDHolding{})
 	db.AutoMigrate(&FDFile{})
+	db.AutoMigrate(&StockFile{})
+	db.AutoMigrate(&MFFile{})
 }
 
 func handleError(err error) {
