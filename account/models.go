@@ -123,6 +123,7 @@ func GetBankAccountsByUser(userId uint) ([]BankAccount, error) {
 	err := db.Where("user_id = ?", userId).Find(&accounts).Error
 	return accounts, err
 }
+
 func GetDematAccountsByUser(userId uint) ([]DematAccount, error) {
 	var accounts []DematAccount
 	err := db.Where("user_id = ?", userId).Find(&accounts).Error
