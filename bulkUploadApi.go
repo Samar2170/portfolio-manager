@@ -13,11 +13,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Response struct {
-	Message string
-	Data    interface{}
-}
-
 const (
 	UPLOADFILES_DIR     = "upload_files/"
 	FD_TEMPLATE_FILE    = "FDBUTemp.csv"

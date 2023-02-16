@@ -16,21 +16,6 @@ type Stock struct {
 	Industry     string
 }
 
-type ListedNCD struct {
-	*gorm.Model
-	ID            uint   `gorm:"primaryKey"`
-	Name          string `gorm:"uniqueIndex"`
-	Symbol        string `gorm:"uniqueIndex"`
-	SecurityCode  string `gorm:"unique"`
-	Exchange      string
-	IPFreq        string
-	IPRate        float64
-	IPDate        time.Time
-	MtDate        time.Time
-	FaceValue     float64
-	MaturityValue float64
-}
-
 type Crypto struct {
 	*gorm.Model
 	ID       uint   `gorm:"primaryKey"`

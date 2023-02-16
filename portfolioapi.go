@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Samar2170/portfolio-manager/portfolio"
 	"github.com/Samar2170/portfolio-manager/utils"
@@ -81,6 +82,31 @@ func RegisterMFTrades(c echo.Context) error {
 
 }
 
+func RegisterBondTrade(c echo.Context) error {
+	symbol := strings.ToUpper(c.FormValue("symbol"))
+	quantity := c.FormValue("quantity")
+	price := c.FormValue("price")
+	tradeDate := c.FormValue("trade_date")
+	dematAccount := c.FormValue("demat_account")
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
+	_, err = portfolio.CreateListedNCDHolding(symbol, quantity, price, tradeDate, dematAccount, user.Id)
+	if err != nil {
+		return c.JSON(
+			http.StatusBadRequest, Response{
+				Message: err.Error(),
+			},
+		)
+	}
+	return c.JSON(http.StatusAccepted, map[string]string{
+		"message": "trade registered successfully",
+	})
+}
+
 func RegisterFD(c echo.Context) error {
 	bankName := c.FormValue("bank")
 	amount := c.FormValue("amount")
@@ -98,8 +124,12 @@ func RegisterFD(c echo.Context) error {
 	}
 	mtDate := c.FormValue("maturity_date")
 	accNumber := c.FormValue("account_number")
-	// user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
-
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
 	if ipDate == "" {
 		ipDate = startDate
 	}
@@ -128,7 +158,7 @@ func RegisterFD(c echo.Context) error {
 			"message": "make sure ipRate is in 0.0x Format",
 		})
 	}
-	fdh, err := portfolio.CreateFDHolding(bankName, amountFloat, mtAmountFloat, ipRateFloat, ipFreq, startDate, ipDate, mtDate, accNumber)
+	fdh, err := portfolio.CreateFDHolding(bankName, amountFloat, mtAmountFloat, ipRateFloat, ipFreq, startDate, ipDate, mtDate, accNumber, user.Id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": err.Error(),

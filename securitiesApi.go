@@ -83,3 +83,25 @@ func SearchMutualFunds(c echo.Context) error {
 	pages.Rows = stocks
 	return c.JSON(http.StatusOK, pages)
 }
+
+func RegisterBond(c echo.Context) error {
+	name, symbol := c.QueryParam("name"), c.QueryParam("symbol")
+	securityCode, exchange := c.QueryParam("security_code"), c.QueryParam("exchange")
+	ipFreq, ipDate, ipRate := c.QueryParam("ip_frequency"), c.QueryParam("ip_date"), c.QueryParam("ip_rate")
+	mtDate, faceValue, mtValue := c.QueryParam("maturity_date"), c.QueryParam("face_value"), c.QueryParam("maturity_value")
+	if name == "" || symbol == "" || ipRate == "" || ipFreq == "" || mtDate == "" || faceValue == "" {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: "all fields should be non empty (symbol,name,ip_frequency,maturity_date,ip_date,ip_rate)",
+		})
+	}
+	_, err := securities.CreateListedNCD(name, symbol, securityCode, exchange, ipRate, ipFreq,
+		ipDate, mtDate, faceValue, mtValue)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Response{
+			Message: err.Error(),
+		})
+	}
+	return c.JSON(http.StatusBadRequest, Response{
+		Message: "Bond Registered Successfully",
+	})
+}

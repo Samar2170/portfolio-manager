@@ -57,7 +57,7 @@ func GetFDFileById(fileId uint) (FDFile, error) {
 	return fdf, err
 }
 
-func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq string, startDate, ipDate, mtDate, accNumber string) (FDHolding, error) {
+func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq string, startDate, ipDate, mtDate, accNumber string, userId uint) (FDHolding, error) {
 	bankNameCap := strings.ToUpper(bankName)
 	if _, ok := BankNames[bankNameCap]; !ok {
 		return FDHolding{}, errors.New("unknown bank name")
@@ -81,6 +81,10 @@ func CreateFDHolding(bankName string, amount, mtAmount, ipRate float64, ipfreq s
 	MtDateParsed, err := time.Parse(DtFormat, mtDate)
 	if err != nil {
 		return FDHolding{}, errors.New("mtDate date not valid")
+	}
+	check := account.CheckBankAccountAndUserId(userId, accNumber)
+	if !check {
+		return FDHolding{}, errors.New("bank account and user do not match")
 	}
 	fd := securities.FixedDeposit{
 		// BankName:  bankNameCap,

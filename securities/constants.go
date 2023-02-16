@@ -12,6 +12,7 @@ const (
 	MFSchemesFile    = "./Assets/SchemeData2312221939SS.xlsx"
 	NSE500StocksFile = "./Assets/ind_nifty500list.xlsx"
 	BATCHSIZE        = 10
+	DtFormat         = "2006-01-02"
 )
 
 var ValidIPFreqs = map[string]struct{}{

@@ -11,6 +11,11 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
+type Response struct {
+	Message string
+	Data    interface{}
+}
+
 func StartApiServer() {
 	e := echo.New()
 	e.POST("/signup", signup)

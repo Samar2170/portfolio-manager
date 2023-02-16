@@ -30,3 +30,6 @@
     * 
 
 
+### Points
+* CHeck for bank account user in Create FD
+
