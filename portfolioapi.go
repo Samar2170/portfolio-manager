@@ -82,7 +82,7 @@ func RegisterMFTrades(c echo.Context) error {
 
 }
 
-func RegisterBondTrade(c echo.Context) error {
+func RegisterListedNCDTrade(c echo.Context) error {
 	symbol := strings.ToUpper(c.FormValue("symbol"))
 	quantity := c.FormValue("quantity")
 	price := c.FormValue("price")
@@ -95,6 +95,29 @@ func RegisterBondTrade(c echo.Context) error {
 		})
 	}
 	_, err = portfolio.CreateListedNCDHolding(symbol, quantity, price, tradeDate, dematAccount, user.Id)
+	if err != nil {
+		return c.JSON(
+			http.StatusBadRequest, Response{
+				Message: err.Error(),
+			},
+		)
+	}
+	return c.JSON(http.StatusAccepted, map[string]string{
+		"message": "trade registered successfully",
+	})
+}
+func RegisterUnistedNCDTrade(c echo.Context) error {
+	symbol := strings.ToUpper(c.FormValue("symbol"))
+	quantity := c.FormValue("quantity")
+	price := c.FormValue("price")
+	tradeDate := c.FormValue("trade_date")
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
+	_, err = portfolio.CreateUnlistedNCDHolding(symbol, quantity, price, tradeDate, user.Id)
 	if err != nil {
 		return c.JSON(
 			http.StatusBadRequest, Response{

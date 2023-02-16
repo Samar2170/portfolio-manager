@@ -129,3 +129,9 @@ func GetDematAccountsByUser(userId uint) ([]DematAccount, error) {
 	err := db.Where("user_id = ?", userId).Find(&accounts).Error
 	return accounts, err
 }
+
+func GetGeneralAccountByUser(userId uint) (GeneralAccount, error) {
+	var ga GeneralAccount
+	err := db.Where("user_id = ?", userId).First(&ga).Error
+	return ga, err
+}

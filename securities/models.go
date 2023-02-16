@@ -24,18 +24,6 @@ type Crypto struct {
 	Exchange string
 }
 
-type UnlistedNCD struct {
-	*gorm.Model
-	ID            uint `gorm:"primaryKey"`
-	Name          uint `gorm:"unique"`
-	IPFreq        string
-	IPDate        time.Time
-	MtDate        time.Time
-	IPRate        float64
-	FaceValue     float64
-	MaturityValue float64
-}
-
 type FixedDeposit struct {
 	*gorm.Model
 	ID uint `gorm:"primaryKey"`

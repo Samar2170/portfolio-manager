@@ -25,6 +25,8 @@ func StartApiServer() {
 	e.POST("/register-account/bank", RegisterBankAccounts)
 	e.POST("/register-trade/stock", RegisterStockTrades)
 	e.POST("/register-trade/mf", RegisterMFTrades)
+	e.POST("/register-trade/listed-ncd", RegisterUnistedNCDTrade)
+	e.POST("/register-trade/unlisted-ncd", RegisterUnistedNCDTrade)
 	e.POST("/register-fd", RegisterFD)
 
 	e.GET("/view-accounts", ViewAccounts)
