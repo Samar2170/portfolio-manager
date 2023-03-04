@@ -3,16 +3,7 @@ package main
 import "sync"
 
 func main() {
-	var wg sync.WaitGroup
-
-	wg.Add(1)
-	go RunServicesConcurrently()
-	// testNewService()
-	ac := APIClient{Token: ""}
-	wg.Add(1)
-	go ac.getToken(1592798840)
-
-	wg.Wait()
+	RunServicesConcurrently()
 }
 
 func RunServicesConcurrently() {
