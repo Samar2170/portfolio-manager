@@ -50,3 +50,18 @@ ____________________        ___________________
 * Calculate Accrued Interest.   (Cronj, portfolio)
 
 
+
+#### Telegram Integration
+##### ADR
+* How to implement ? 
+    1. Telegram parses message [View,Register]
+        1. Level 2 Parser parses formname inside [`[RegisterDematAccount]`]
+        2. Get params keys and values, Create a JSON , send it to api endpoint. 
+        3. Write Auth Middleware for http client for this. 
+
+* Auth, API gives out a 6 Digit OTP, which is then used in telegram to authenticate.
+
+* Endpoints
+    * Authenticate using OTP.
+    * Corresponding endpoint for each API endpoint. 
+

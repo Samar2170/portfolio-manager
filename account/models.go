@@ -2,6 +2,7 @@ package account
 
 import (
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -46,6 +47,59 @@ type BankAccount struct {
 	User      User   `gorm:"foreignKey:UserId"`
 	UserId    uint
 	Bank      string
+}
+
+type TelegramOTP struct {
+	*gorm.Model
+	ID        uint
+	User      User `gorm:"foreignKey:UserId"`
+	UserId    uint
+	OTP       uint
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type TelegramUser struct {
+	*gorm.Model
+	ID     uint
+	User   User `gorm:"foreignKey:UserId"`
+	UserId uint
+	ChatId int64 `gorm:"unique_index"`
+}
+
+func (totp TelegramOTP) Create() error {
+	err := db.Create(&totp).Error
+	return err
+}
+func (tu TelegramUser) Create() error {
+	err := db.Create(&tu).Error
+	return err
+}
+func GetUserByTelegramOTP(otp uint) (User, error) {
+	var user User
+	var tgOtp TelegramOTP
+	err := db.Where("otp = ?", otp).First(&tgOtp).Error
+	if err != nil {
+		return User{}, err
+	}
+	err = db.Where("user_id = ?", tgOtp.UserId).First(&user).Error
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+}
+
+func GetUserByChatId(chatID int64) (User, error) {
+	var tgUser TelegramUser
+	err := db.Where("chat_id = ?", chatID).First(&tgUser).Error
+	if err != nil {
+		return User{}, err
+	}
+	user, err := GetUserById(tgUser.UserId)
+	if err != nil {
+		return User{}, err
+	}
+	return user, err
 }
 
 func (u *User) GetOrCreate() (User, error) {

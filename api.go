@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,6 +21,9 @@ func StartApiServer() {
 	e := echo.New()
 	e.POST("/signup", signup)
 	e.POST("/login", login)
+
+	e.GET("/get-telegram-otp", GetTelegramOTP)
+	e.POST("/chat-id-login", chatLogin)
 
 	e.POST("/register-account/demat", RegisterDematAccounts)
 	e.POST("/register-account/bank", RegisterBankAccounts)
@@ -43,7 +47,7 @@ func StartApiServer() {
 		TokenLookup: "header:Authorization",
 		ContextKey:  "user",
 		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/signup" || c.Path() == "/login" {
+			if c.Path() == "/signup" || c.Path() == "/login" || c.Path() == "/chat-id-login" {
 				return true
 			}
 			return false
@@ -51,6 +55,9 @@ func StartApiServer() {
 	}))
 
 	e.GET("/", hello)
-	e.Logger.Fatal(e.Start(":1323"))
+	// e.Logger.Fatal(e.Start(":1323"))
+	if err := e.Start(":1323"); err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
 
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/account"
@@ -9,6 +11,32 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
+
+const (
+	OTP_MIN = 100000
+	OTP_MAX = 999999
+)
+
+func chatLogin(c echo.Context) error {
+	chatId := c.FormValue("chat_id")
+	chatIdInt, _ := strconv.ParseInt(chatId, 10, 64)
+
+	user, _ := account.GetUserByChatId(int64(chatIdInt))
+	claims := &account.JwtCustomClaims{
+		user.ID, user.Username, jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Minute * 1).Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": t,
+	})
+
+}
 
 func login(c echo.Context) error {
 	username := c.FormValue("username")
@@ -162,4 +190,33 @@ func ViewAccounts(c echo.Context) error {
 		Message: "Good",
 		Data:    dataResponse,
 	})
+}
+
+func GetTelegramOTP(c echo.Context) error {
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "User Id not found",
+		})
+	}
+	randomOTP := rand.Intn(OTP_MAX-OTP_MIN) + OTP_MIN
+	telegramOtp := account.TelegramOTP{
+		UserId:    user.Id,
+		OTP:       uint(randomOTP),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err = telegramOtp.Create()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Something went wrong")
+	}
+	responseMap := Response{
+		Data: map[string]int{
+			"OTP": randomOTP,
+		},
+		Message: "valid for 1 min 30 seconds",
+	}
+	return c.JSON(
+		http.StatusOK, responseMap,
+	)
 }

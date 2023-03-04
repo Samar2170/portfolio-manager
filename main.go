@@ -1,15 +1,18 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-
-	"github.com/Samar2170/portfolio-manager/portfolio"
-)
+import "sync"
 
 func main() {
-	RunServicesConcurrently()
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go RunServicesConcurrently()
 	// testNewService()
+	ac := APIClient{Token: ""}
+	wg.Add(1)
+	go ac.getToken(1592798840)
+
+	wg.Wait()
 }
 
 func RunServicesConcurrently() {
@@ -29,27 +32,5 @@ func RunServicesConcurrently() {
 }
 
 func testNewService() {
-	err := portfolio.ParseFDFile(2)
-	if err != nil {
-		fmt.Println(err)
-	}
+	StartBot()
 }
-
-// func loadScripts() {
-// 	err := securities.LoadNiftyStocks()
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// 	stocks, err := securities.GetAllStocks()
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// 	for _, stock := range stocks {
-// 		fmt.Println(stock.ID)
-// 	}
-// 	err = securities.LoadMutualFunds()
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-
-// }

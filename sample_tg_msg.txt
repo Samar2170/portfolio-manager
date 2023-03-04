@@ -1,0 +1,3 @@
+[RegisterBankAccounts]
+account_number: 13246
+bank:  Kotak
