@@ -9,8 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Samar2170/portfolio-manager/account"
-	"github.com/Samar2170/portfolio-manager/telegramApi"
+	telegramApi "github.com/Samar2170/portfolio-manager/telegramApi"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/spf13/viper"
 )
@@ -68,35 +67,27 @@ func StartBot() {
 
 func parseForm(msg string, chatID int64) string {
 	lines := strings.Split(msg, "\n")
-	for i, l := range lines {
-		if string(l[0]) == "[" && string(l[len(l)-1]) == "]" {
-			formName := string(l[1 : len(l)-1])
-			switch formName {
-			case "RegisterBankAccounts":
-				telegramApi.TgRegisterDematAccount(lines[i:], chatID)
-			case "RegisterDematAccounts":
-				telegramApi.TgRegisterDematAccount(lines[i:], chatID)
+	fmt.Println(lines)
+	_, formName := lines[0], lines[1]
+	if string(formName[0]) == "[" && string(formName[len(formName)-1]) == "]" {
+		switch formName {
+		case "[RegisterBankAccounts]":
+			err := telegramApi.TgRegisterBankAccount(lines[2:], chatID)
+			if err != nil {
+				return err.Error()
 			}
-		} else {
-			continue
+		case "[RegisterDematAccounts]":
+			err := telegramApi.TgRegisterDematAccount(lines[2:], chatID)
+			if err != nil {
+				return err.Error()
+			}
 		}
+	} else {
+		return "Form name not clear"
+	}
 
-	}
-	return strings.Join(lines, ",")
-}
-func registerUser(msg string, chatId int64) string {
-	words := strings.Split(msg, " ")
-	otp, err := strconv.ParseInt(words[1], 10, 64)
-	if err != nil {
-		return "otp is not an integer"
-	}
-	user, err := account.GetUserByTelegramOTP(uint(otp))
-	if err != nil {
-		return "user not found for otp"
-	}
-	tgUser := account.TelegramUser{User: user, ChatId: chatId}
-	tgUser.Create()
-	return "user created successfully"
+	return "registered successfully"
+
 }
 
 func MsgRouter(update tgbotapi.Update) string {
@@ -106,7 +97,7 @@ func MsgRouter(update tgbotapi.Update) string {
 	fmt.Println(route[0])
 	switch route[0] {
 	case "/register":
-		return registerUser(update.Message.Text, update.Message.Chat.ID)
+		return telegramApi.TgRegisterUser(update.Message.Text, update.Message.Chat.ID)
 	case "/register-trade":
 		return parseForm(update.Message.Text, update.Message.Chat.ID)
 	case "/subscribe":

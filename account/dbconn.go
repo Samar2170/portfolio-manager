@@ -19,6 +19,9 @@ func connect() {
 	db.AutoMigrate(&BankAccount{})
 
 	db.AutoMigrate(&JobRecord{})
+
+	db.AutoMigrate(&TelegramOTP{})
+	db.AutoMigrate(&TelegramUser{})
 }
 
 func handleError(err error) {

@@ -18,6 +18,9 @@ func RunServicesConcurrently() {
 	wg.Add(1)
 	go StartCronServer()
 
+	wg.Add(1)
+	go StartBot()
+
 	wg.Wait()
 
 }

@@ -82,7 +82,7 @@ func GetUserByTelegramOTP(otp uint) (User, error) {
 	if err != nil {
 		return User{}, err
 	}
-	err = db.Where("user_id = ?", tgOtp.UserId).First(&user).Error
+	err = db.Where("id = ?", tgOtp.UserId).First(&user).Error
 	if err != nil {
 		return User{}, err
 	}
