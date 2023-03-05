@@ -18,12 +18,13 @@ const (
 
 func RegisterStockTrades(c echo.Context) error {
 	var err error
-	stockSymbol := c.FormValue("symbol")
-	dematAccCode := c.FormValue("demat")
-	quantity := c.FormValue("quantity")
-	price := c.FormValue("price")
-	tradeType := c.FormValue("trade_type")
-	tradeDate := c.FormValue("trade_date")
+	st := new(StockTrade)
+	if err := c.Bind(st); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	stockSymbol, dematAccCode := st.Symbol, st.Demat
+	quantity, price := st.Quantity, st.Price
+	tradeType, tradeDate := st.TradeType, st.TradeDate
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -87,7 +88,7 @@ func RegisterListedNCDTrade(c echo.Context) error {
 	quantity := c.FormValue("quantity")
 	price := c.FormValue("price")
 	tradeDate := c.FormValue("trade_date")
-	dematAccount := c.FormValue("demat_account")
+	dematAccount := c.FormValue("demat")
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{

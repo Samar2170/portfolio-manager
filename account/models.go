@@ -114,7 +114,7 @@ func CheckBankAccountAndUserId(userId uint, accountNumber string) bool {
 }
 func CheckDematAccountAndUserId(userId uint, dematAccCode string) bool {
 	var record DematAccount
-	err := db.Where("account_no = ? AND user_id = ?", dematAccCode, userId).First(&record).Error
+	err := db.Where("code = ? AND user_id = ?", dematAccCode, userId).First(&record).Error
 	return err != gorm.ErrRecordNotFound
 }
 

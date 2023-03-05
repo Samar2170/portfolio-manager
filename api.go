@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -18,6 +19,12 @@ type Response struct {
 
 func StartApiServer() {
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000/", "http://localhost:3000"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAccessControlAllowCredentials,
+			echo.HeaderAuthorization},
+		AllowCredentials: true,
+	}))
 	e.POST("/signup", signup)
 	e.POST("/login", login)
 
@@ -36,6 +43,7 @@ func StartApiServer() {
 
 	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
 	e.GET("/securities/stocks/search", SearchStocks)
+	e.GET("/securities/stocks-list", StocksList)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
@@ -47,6 +55,10 @@ func StartApiServer() {
 				return true
 			}
 			return false
+		},
+		ErrorHandler: func(err error) error {
+			log.Println(err.Error())
+			return err
 		},
 	}))
 

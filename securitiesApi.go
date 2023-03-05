@@ -126,3 +126,15 @@ func RegisterUnlistedNCD(c echo.Context) error {
 		Message: "Unlisted NCD Registered Successfully",
 	})
 }
+
+func StocksList(c echo.Context) error {
+	stocks, _ := securities.GetStocksSymbols()
+	resp := Response{
+		Message: "success",
+		Data: map[string][]string{
+			"data": stocks,
+		},
+	}
+	return c.JSON(http.StatusOK, resp)
+
+}

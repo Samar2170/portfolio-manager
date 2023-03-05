@@ -17,6 +17,20 @@ func GetAllStocks() ([]Stock, error) {
 	err := db.Find(&stocks).Error
 	return stocks, err
 }
+func GetStocksSymbols() ([]string, error) {
+	var stocks []Stock
+	var symbols []string
+
+	err := db.Find(&stocks).Error
+	if err != nil {
+		return symbols, err
+	}
+	for _, stock := range stocks {
+		symbols = append(symbols, stock.Symbol)
+	}
+	return symbols, nil
+
+}
 
 func GetStockBySymbol(symbol string) (Stock, error) {
 	var stock Stock

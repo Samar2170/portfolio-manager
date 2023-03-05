@@ -174,11 +174,11 @@ func CreateStockTrade(symbol, dematAccCode, quantity, price, tradeType, tradeDat
 			return StockTrade{}, errors.New("trade date should be in format 2022-11-22")
 		}
 	}
-	quantityFloat, err := strconv.ParseFloat(quantity, 64)
+	quantityFloat, err := strconv.Atoi(quantity)
 	if err != nil {
 		return StockTrade{}, errors.New("quantity should be a number")
 	}
-	priceFloat, err := strconv.Atoi(price)
+	priceFloat, err := strconv.ParseFloat(price, 64)
 	if err != nil {
 		return StockTrade{}, errors.New("price should be a number")
 	}

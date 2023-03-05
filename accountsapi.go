@@ -11,13 +11,16 @@ import (
 )
 
 func login(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
-	user, err := account.GetUserByUsername(username)
+	u := new(LoginUser)
+	if err := c.Bind(u); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+
+	user, err := account.GetUserByUsername(u.Username)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	if user.Password != password {
+	if user.Password != u.Password {
 		return c.String(http.StatusInternalServerError, "Invalid Password")
 	}
 	claims := &account.JwtCustomClaims{
@@ -67,9 +70,12 @@ func signup(c echo.Context) error {
 }
 
 func RegisterDematAccounts(c echo.Context) error {
-	code := c.FormValue("code")
-	broker := c.FormValue("broker")
-
+	demat := new(DematAccount)
+	if err := c.Bind(demat); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	code := demat.Code
+	broker := demat.Broker
 	if code == "" || broker == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"message": "Code and Broker must not be empty",
@@ -93,8 +99,12 @@ func RegisterDematAccounts(c echo.Context) error {
 		})
 }
 func RegisterBankAccounts(c echo.Context) error {
-	accountNo := c.FormValue("account_number")
-	bank := c.FormValue("bank")
+	bankAccount := new(BankAccount)
+	if err := c.Bind(bankAccount); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	accountNo := bankAccount.AccountNumber
+	bank := bankAccount.Bank
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
@@ -120,12 +130,6 @@ func RegisterBankAccounts(c echo.Context) error {
 
 func ViewAccounts(c echo.Context) error {
 	accountType := c.FormValue("type")
-	// if accountType != "bank" && accountType != "demat" {
-	// 	return c.JSON(http.StatusBadRequest, Response{
-	// 		Message: "type parameter should bank or demat",
-	// 	})
-	// }
-
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusForbidden, Response{Message: "Please log in"})
