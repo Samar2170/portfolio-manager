@@ -138,3 +138,25 @@ func StocksList(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 
 }
+
+func NCDList(c echo.Context) error {
+	ncds, _ := securities.GetNCDList()
+	resp := Response{
+		Message: "success",
+		Data: map[string][]string{
+			"data": ncds,
+		},
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+func UnlistedNCDList(c echo.Context) error {
+	ncds, _ := securities.GetNCDList()
+	resp := Response{
+		Message: "success",
+		Data: map[string][]string{
+			"data": ncds,
+		},
+	}
+	return c.JSON(http.StatusOK, resp)
+}

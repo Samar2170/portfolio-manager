@@ -176,7 +176,7 @@ func CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate str
 	if err != nil {
 		return MFTrade{}, errors.New("quantity should be a number")
 	}
-	priceFloat, err := strconv.Atoi(price)
+	priceFloat, err := strconv.ParseFloat(price, 64)
 	if err != nil {
 		return MFTrade{}, errors.New("price should be a number")
 	}

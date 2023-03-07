@@ -51,12 +51,13 @@ func RegisterStockTrades(c echo.Context) error {
 
 func RegisterMFTrades(c echo.Context) error {
 	var err error
-	mfId := c.FormValue("mutual_fund_id")
-	dematAccCode := c.FormValue("demat")
-	quantity := c.FormValue("quantity")
-	price := c.FormValue("price")
-	tradeType := c.FormValue("trade_type")
-	tradeDate := c.FormValue("trade_date")
+	mft := new(MFTrade)
+	if err := c.Bind(mft); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	mfId, dematAccCode := mft.MutualFundId, mft.Demat
+	quantity, price := mft.Quantity, mft.Price
+	tradeType, tradeDate := mft.TradeType, mft.TradeDate
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -71,24 +72,26 @@ func RegisterMFTrades(c echo.Context) error {
 	_, err = portfolio.CreateMFTrade(mfId, dematAccCode, quantity, price, tradeType, tradeDate, user.Id)
 	if err != nil {
 		return c.JSON(
-			http.StatusConflict, Response{
+			http.StatusBadRequest, Response{
 				Message: err.Error(),
 			},
 		)
 	}
 	return c.JSON(
-		http.StatusConflict, Response{
+		http.StatusOK, Response{
 			Message: "trade registered successfully",
 		})
 
 }
 
 func RegisterListedNCDTrade(c echo.Context) error {
-	symbol := strings.ToUpper(c.FormValue("symbol"))
-	quantity := c.FormValue("quantity")
-	price := c.FormValue("price")
-	tradeDate := c.FormValue("trade_date")
-	dematAccount := c.FormValue("demat")
+	lncdt := new(ListedNCDTrade)
+	if err := c.Bind(lncdt); err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	symbol, quantity, price := lncdt.Symbol, lncdt.Quantity, lncdt.Price
+	dematAccount, tradeDate := lncdt.Demat, lncdt.TradeDate
+
 	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -107,6 +110,7 @@ func RegisterListedNCDTrade(c echo.Context) error {
 		"message": "trade registered successfully",
 	})
 }
+
 func RegisterUnistedNCDTrade(c echo.Context) error {
 	symbol := strings.ToUpper(c.FormValue("symbol"))
 	quantity := c.FormValue("quantity")

@@ -38,6 +38,19 @@ func GetListedNCDBySymbol(symbol string) (ListedNCD, error) {
 	return lncd, err
 }
 
+func GetNCDList() ([]string, error) {
+	var ncds []ListedNCD
+	var symbols []string
+
+	err := db.Find(&ncds).Error
+	if err != nil {
+		return symbols, err
+	}
+	for _, ncd := range ncds {
+		symbols = append(symbols, ncd.Symbol)
+	}
+	return symbols, nil
+}
 func CreateListedNCD(name, symbol, securityCode, exchange, ipRate, ipFreq, ipDate, mtDate, faceValue, mtValue string) (ListedNCD, error) {
 	symbol = strings.ToUpper(symbol)
 	if mtValue == "" {

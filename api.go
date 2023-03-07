@@ -28,6 +28,9 @@ func StartApiServer() {
 	e.POST("/signup", signup)
 	e.POST("/login", login)
 
+	e.POST("/register-securities/listed-ncd", RegisterListedNCD)
+	e.POST("/register-securities/unlisted-ncd", RegisterUnlistedNCD)
+
 	e.POST("/register-account/demat", RegisterDematAccounts)
 	e.POST("/register-account/bank", RegisterBankAccounts)
 	e.POST("/register-trade/stock", RegisterStockTrades)
@@ -44,6 +47,9 @@ func StartApiServer() {
 	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
 	e.GET("/securities/stocks/search", SearchStocks)
 	e.GET("/securities/stocks-list", StocksList)
+	e.GET("/securities/ncd-list", NCDList)
+	e.GET("/securities/unlisted-ncd-list", UnlistedNCDList)
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
