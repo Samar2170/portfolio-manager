@@ -17,8 +17,17 @@ type Response struct {
 	Data    interface{}
 }
 
+func customHTTPErrorHandler(err error, c echo.Context) {
+	if err.Error() == "Token is expired" {
+		c.Error(echo.NewHTTPError(http.StatusUnauthorized, "Login required"))
+		return
+	}
+	c.Echo().DefaultHTTPErrorHandler(err, c)
+}
+
 func StartApiServer() {
 	e := echo.New()
+	e.HTTPErrorHandler = customHTTPErrorHandler
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000/", "http://localhost:3000"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAccessControlAllowCredentials,
@@ -42,7 +51,7 @@ func StartApiServer() {
 	e.GET("/view-accounts", ViewAccounts)
 
 	e.POST("/bulk-upload/:security", UploadFile)
-	e.POST("bulk-upload-template/:security", DownloadTemplateFile)
+	e.GET("/bulk-upload-template/:security", DownloadTemplateFile)
 
 	e.GET("/securities/mutual-funds/search", SearchMutualFunds)
 	e.GET("/securities/stocks/search", SearchStocks)
@@ -63,7 +72,8 @@ func StartApiServer() {
 			return false
 		},
 		ErrorHandler: func(err error) error {
-			log.Println(err.Error())
+			log.Println(err)
+			log.Printf("%T", err)
 			return err
 		},
 	}))

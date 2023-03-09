@@ -15,9 +15,10 @@ import (
 
 const (
 	UPLOADFILES_DIR     = "upload_files/"
-	FD_TEMPLATE_FILE    = "FDBUTemp.csv"
-	MF_TEMPLATE_FILE    = "MFTradeBUTemp.csv"
-	STOCK_TEMPLATE_FILE = "StockTradeBUTemp.csv"
+	ASSETFILES_DIR      = "Assets/"
+	FD_TEMPLATE_FILE    = "templates/FDBUTemp.csv"
+	MF_TEMPLATE_FILE    = "templates/MFTradeBUTemp.csv"
+	STOCK_TEMPLATE_FILE = "templates/StockTradeBUTemp.csv"
 )
 
 func DownloadTemplateFile(c echo.Context) error {
@@ -29,11 +30,11 @@ func DownloadTemplateFile(c echo.Context) error {
 	}
 	switch security {
 	case "fd":
-		return c.File(UPLOADFILES_DIR + FD_TEMPLATE_FILE)
+		return c.File(ASSETFILES_DIR + FD_TEMPLATE_FILE)
 	case "mf":
-		return c.File(UPLOADFILES_DIR + MF_TEMPLATE_FILE)
+		return c.File(ASSETFILES_DIR + MF_TEMPLATE_FILE)
 	case "stock", "stocks", "shares":
-		return c.File(UPLOADFILES_DIR + STOCK_TEMPLATE_FILE)
+		return c.File(ASSETFILES_DIR + STOCK_TEMPLATE_FILE)
 	}
 	return nil
 }
