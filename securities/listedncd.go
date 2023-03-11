@@ -197,7 +197,6 @@ func CalculateAccruedInterestAllListedNCDs() error {
 		for _, lncd := range lncds {
 			accruedInterest := CalculateAccruedInterestListedNCD(lncd)
 			db.Model(&lncd).Where("id = ?", lncd.ID).Update("accrued_interest", accruedInterest)
-
 		}
 	}
 	return nil
