@@ -129,6 +129,27 @@ func GetDematAccountsByUser(userId uint) ([]DematAccount, error) {
 	err := db.Where("user_id = ?", userId).Find(&accounts).Error
 	return accounts, err
 }
+func GetDematAccountIdsByUser(userId uint) ([]uint, error) {
+	var dematAccounts []DematAccount
+	var ids []uint
+
+	db.Where("user_id = ?", userId).Find(&dematAccounts)
+	for _, da := range dematAccounts {
+		ids = append(ids, da.ID)
+	}
+	return ids, nil
+}
+
+func GetBankAccountIdsByUser(userId uint) ([]uint, error) {
+	var bankAccounts []BankAccount
+	var ids []uint
+
+	db.Where("user_id = ?", userId).Find(&bankAccounts)
+	for _, da := range bankAccounts {
+		ids = append(ids, da.ID)
+	}
+	return ids, nil
+}
 
 func GetGeneralAccountByUser(userId uint) (GeneralAccount, error) {
 	var ga GeneralAccount

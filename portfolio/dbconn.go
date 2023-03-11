@@ -22,6 +22,19 @@ func connect() {
 	db.AutoMigrate(&FDFile{})
 	db.AutoMigrate(&StockFile{})
 	db.AutoMigrate(&MFFile{})
+	db.AutoMigrate(&ListedNCDHolding{})
+
+}
+
+type HoldingSecurity struct {
+	Name         string
+	CurrentValue float64
+	Invested     float64
+	Category     string
+}
+
+type HoldingValue interface {
+	getHoldings() HoldingSecurity
 }
 
 func handleError(err error) {

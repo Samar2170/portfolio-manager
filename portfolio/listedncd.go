@@ -67,3 +67,18 @@ func CreateListedNCDHolding(symbol, quantity, price, tradeDate, dematAccountCode
 	}
 	return lncdh, nil
 }
+func GetListedNCDByUser(userId uint) []ListedNCDHolding {
+	var holdings []ListedNCDHolding
+	dematIds, _ := account.GetDematAccountIdsByUser(userId)
+	db.Joins("ListedNCD").Find(&holdings, "demat_account_id IN ?", dematIds)
+	return holdings
+}
+
+func (lncdh ListedNCDHolding) getHoldings() HoldingSecurity {
+	return HoldingSecurity{
+		Name:         lncdh.ListedNCD.Name,
+		CurrentValue: lncdh.DirtyPrice * lncdh.DirtyPrice,
+		Invested:     lncdh.Quantity * lncdh.DirtyPrice,
+		Category:     "Listed-NCD",
+	}
+}

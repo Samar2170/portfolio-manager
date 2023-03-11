@@ -197,3 +197,30 @@ func RegisterFD(c echo.Context) error {
 	})
 
 }
+
+func GetHoldings(c echo.Context) error {
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+	category := c.QueryParam("category")
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
+	holdings := portfolio.GetHoldingsByUser(user.Id, category)
+	r := Response{Message: "success", Data: holdings}
+	return c.JSON(200, r)
+}
+
+func GetHoldingsAggregates(c echo.Context) error {
+	user, err := utils.UnwrapToken(c.Get("user").(*jwt.Token))
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "User detail not Found",
+		})
+	}
+	holdings := portfolio.GetHoldingsAggregatesByUser(user.Id)
+	r := Response{Message: "success", Data: holdings}
+	return c.JSON(200, r)
+}

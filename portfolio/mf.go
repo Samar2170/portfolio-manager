@@ -224,3 +224,19 @@ func ParseMFFIle(fileId uint) error {
 	return nil
 
 }
+
+func GetMFHoldingsByUser(userId uint) []MFHolding {
+	var holdings []MFHolding
+	dematIds, _ := account.GetDematAccountIdsByUser(userId)
+	db.Joins("MF").Find(&holdings, "demat_account_id IN ?", dematIds)
+	return holdings
+}
+
+func (mfh MFHolding) getHoldings() HoldingSecurity {
+	return HoldingSecurity{
+		Name:         mfh.MF.SchemeName,
+		Invested:     mfh.Price * mfh.Quantity,
+		CurrentValue: 0,
+		Category:     "MF",
+	}
+}

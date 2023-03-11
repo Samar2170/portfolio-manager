@@ -8,6 +8,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+var ExemptPaths = map[string]struct{}{
+	"/signup":                         {},
+	"/login":                          {},
+	"/bulk-upload-template/:security": {},
+}
+
 func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
@@ -59,6 +65,9 @@ func StartApiServer() {
 	e.GET("/securities/ncd-list", NCDList)
 	e.GET("/securities/unlisted-ncd-list", UnlistedNCDList)
 
+	e.GET("/portfolio/get-holdings", GetHoldings)
+	e.GET("/portfolio/get-holdings-aggregates", GetHoldingsAggregates)
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
@@ -66,10 +75,11 @@ func StartApiServer() {
 		TokenLookup: "header:Authorization",
 		ContextKey:  "user",
 		Skipper: func(c echo.Context) bool {
-			if c.Path() == "/signup" || c.Path() == "/login" {
-				return true
+			if _, ok := ExemptPaths[c.Path()]; !ok {
+				log.Println(ok, c.Path())
+				return false
 			}
-			return false
+			return true
 		},
 		ErrorHandler: func(err error) error {
 			log.Println(err)

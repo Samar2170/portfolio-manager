@@ -249,3 +249,18 @@ func FindInterestDueFD() error {
 	Wg.Wait()
 	return nil
 }
+
+func GetFDsByUser(userId uint) []FDHolding {
+	var holdings []FDHolding
+	dematIds, _ := account.GetBankAccountIdsByUser(userId)
+	db.Joins("FixedDeposit").Find(&holdings, "bank_account_id IN ?", dematIds)
+	return holdings
+}
+func (fdh FDHolding) getHoldings() HoldingSecurity {
+	return HoldingSecurity{
+		Name:         fmt.Sprintf("%f-%s-%s", fdh.FixedDeposit.Amount, fdh.FixedDeposit.IPFreq, fdh.FixedDeposit.MtDate),
+		CurrentValue: fdh.FixedDeposit.Amount + securities.CalculateAccruedInterest(fdh.FixedDeposit),
+		Invested:     fdh.FixedDeposit.Amount,
+		Category:     "FD",
+	}
+}

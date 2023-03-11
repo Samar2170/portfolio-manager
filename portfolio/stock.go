@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -221,4 +222,21 @@ func ParseStockFile(fileId uint) error {
 	fileData.Parsed = true
 	db.Save(&fileData)
 	return nil
+}
+func GetStockHoldingsByUser(userId uint) []StockHolding {
+	var holdings []StockHolding
+	dematIds, _ := account.GetDematAccountIdsByUser(userId)
+	err := db.Joins("Stock").Find(&holdings, "demat_account_id IN ?", dematIds).Error
+	log.Println(err)
+	log.Println(holdings)
+	return holdings
+}
+
+func (sh StockHolding) getHoldings() HoldingSecurity {
+	return HoldingSecurity{
+		Name:         sh.Stock.Symbol,
+		Invested:     sh.Price * float64(sh.Quantity),
+		CurrentValue: 0,
+		Category:     "Stock",
+	}
 }
