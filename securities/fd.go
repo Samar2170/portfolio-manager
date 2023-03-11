@@ -1,7 +1,6 @@
 package securities
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Samar2170/portfolio-manager/utils"
@@ -122,7 +121,6 @@ func CalculateAccruedInterestAllFDs() error {
 	batches := len(ids) / BATCHSIZE
 
 	for i := 0; i <= batches; i++ {
-		fmt.Println(i)
 		newIds := ids[i*BATCHSIZE : i*BATCHSIZE+BATCHSIZE]
 		fds, err := getFdsByIds(newIds)
 		if err != nil {
