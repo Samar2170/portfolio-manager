@@ -3,10 +3,21 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/spf13/viper"
 )
+
+var AllowedHosts []string
+
+func loadConfigFile() {
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig()
+	AllowedHosts = strings.Split(viper.GetString("ALLOWEDHOSTS"), ",")
+
+}
 
 var ExemptPaths = map[string]struct{}{
 	"/signup":                         {},
@@ -32,10 +43,11 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 }
 
 func StartApiServer() {
+	loadConfigFile()
 	e := echo.New()
 	e.HTTPErrorHandler = customHTTPErrorHandler
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000/", "http://localhost:3000"},
+		AllowOrigins: AllowedHosts,
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAccessControlAllowCredentials,
 			echo.HeaderAuthorization},
 		AllowCredentials: true,
